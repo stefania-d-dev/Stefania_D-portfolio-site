@@ -1,75 +1,34 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
 
-* {
-  box-sizing:  border-box;
-  margin: 0;
-  padding: 0;
-  font-family: "Outfit", sans-serif;
-}
-
-body {
-  background: #000;
-}
-
-h1, h4, p, a {
-  color: #fff;
-  text-decoration: none;
-}
-
-ul {
-  list-style-type: none;
-}
-
-.btn {
-  padding: 12px 32px;
-  font-size: 1rem;
-  text-transform: uppercase;
-  background-color: rgb(156, 94, 175);
-  color: #222;
-  border: 1px solid #fff;
-  font-weight: 600;
-  cursor: pointer
-}
-
-.btn-light {
-  background: transparent;
-  color: #fff;
-}
-
-.btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
-  transition: 0.3s;
-}
-
-a:visited btn{
-  color: #fff;
-}
-
-li a:hover, a:hover {
-  color: rgb(156, 94, 175);
-}
-
-a, h1, h2, h3, h4, p, button, input, label, textarea, .load-animation {
-  animation: transitionIn 0.75s;
-}
-
-/* .blink {
-  animation: blinker 0.3s linear infinite;
-}
-
-@keyframes blinker {
-  50% {
-    opacity: 0;
+@layer base {
+  body {
+    background-color: #09090b; /* zinc-950: un nero profondo, moderno e meno aggressivo del #000 puro */
+    color: #f4f4f5; /* zinc-100 */
+    font-family: 'Outfit', sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
-} */
+}
 
-@keyframes transitionIn {
-  from {
-    opacity: 0;
-  }
+html {
+  scroll-behavior: smooth;
+}
 
-  to {
-    opacity: 1;
-  }
+/* Custom Scrollbar minimal per un tocco elegante */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09090b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
 }
