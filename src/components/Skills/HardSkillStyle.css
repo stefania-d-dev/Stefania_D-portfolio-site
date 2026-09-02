@@ -1,0 +1,31 @@
+/* HardSkillStyle.css */
+.img-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  margin-left: 6rem;
+  justify-content: center;
+}
+
+.grid-item {
+  flex: 1 1 200px; /* Adatta la dimensione minima degli elementi */
+  margin: 1rem; /* Ridotto il margine tra gli elementi */
+  text-align: center; /* Centro il testo per ogni grid item */
+}
+
+.grid-img {
+  max-width: 90px;
+  height: auto;
+  display: block;
+  margin: 0.5rem; /* Ridotto il margine tra le icone */
+}
+
+@media screen and (max-width: 640px) {
+  .img-grid {
+    margin-left: 0; /* Rimuovo il margine sinistro per dispositivi più piccoli */
+  }
+  
+  .grid-item {
+    flex: 1 1 100%; /* Prendi tutto lo spazio disponibile su dispositivi più piccoli */
+  }
+}

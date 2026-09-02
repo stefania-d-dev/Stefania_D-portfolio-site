@@ -1,0 +1,40 @@
+.img-grid {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    margin-left: 6rem;
+    justify-content: center;
+  }
+  
+  .grid-item {
+    flex: 1 1 200px; /* Adatta la dimensione minima degli elementi */
+    margin: 1rem;
+    text-align: center; /* Centro il testo per ogni grid item */
+  }
+  
+  .level {
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding: 1rem;
+    color: #fff;
+    text-align: left;
+  }
+  
+  .grid-img {
+    max-width: 90px;
+    height: auto;
+    display: block;
+    margin: 0 auto 1rem; /* Centro le immagini orizzontalmente */
+  }
+  
+  @media screen and (max-width: 640px) {
+    .img-grid {
+      margin-left: 0; /* Rimuovo il margine sinistro per dispositivi più piccoli */
+    }
+    
+    .level {
+      margin-left: 0; /* Rimuovo il margine sinistro per dispositivi più piccoli */
+      text-align: center; /* Centro il testo per dispositivi più piccoli */
+    }
+  }
+  
