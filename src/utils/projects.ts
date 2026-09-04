@@ -20,26 +20,26 @@ export interface UnifiedProject {
 
 export const getAllProjects = (): UnifiedProject[] => {
   // Mappatura progetti di codice
-  const formattedCode = codeProjects.map((p) => ({
+  const formattedCode = codeProjects.map((p: any) => ({
     id: p.id,
     title: p.title,
     description: p.description,
-    image: p.image, // Usa la proprietà corretta del tuo tipo ProjectCode
+    image: p.image,
     category: 'code' as const,
-    tags: p.tech || [], // Usa 'tech' come definito solitamente nel codice
-    link: p.liveUrl || p.repoUrl, // Sostituisci con le proprietà reali del tuo tipo (es. repoUrl o liveUrl)
+    tags: p.tech || p.tags || [],
+    link: p.liveUrl || p.repoUrl,
     slug: `code-${p.id}`,
   }));
 
   // Mappatura progetti di design/marketing
-  const formattedDesign = designProjects.map((p) => ({
+  const formattedDesign = designProjects.map((p: any) => ({
     id: p.id,
     title: p.title,
     description: p.description || '',
-    image: p.image, // Usa la proprietà corretta (es. image)
+    image: p.image,
     category: (p.category === 'marketing' ? 'marketing' : 'design') as 'marketing' | 'design',
-    tags: p.tools || p.software || [], // Adatta in base a come gestisci i tag nel design (es. tools o simili)
-    link: p.liveUrl, // Sostituisci con la proprietà reale del link di design
+    tags: p.tools || p.software || p.tags || [],
+    link: p.liveUrl || p.link,
     slug: `design-${p.id}`,
     challenge: p.challenge,
     solution: p.solution,
