@@ -6,11 +6,8 @@ import { Link } from 'react-router-dom';
 import { projects as designProjects } from '../../data/designProjects';
 import { codeProjects, ProjectCode } from '../../data/codeProjects';
 import {
-  LightningIcon,
-  CodeIcon,
-  PaintBrushIcon,
-  MagnifyingGlassIcon,
-  ArrowDownIcon,
+  ArrowDown,
+  Sparkle,
 } from '@phosphor-icons/react';
 
 interface DesignProject {
@@ -18,26 +15,26 @@ interface DesignProject {
   title: string;
   role: string;
   image: string;
+  year?: string | number;
   accent?: string;
   performance?: string;
 }
 
-type UnifiedProject = (ProjectCode | DesignProject) & { category: 'code' | 'design' };
+type UnifiedProject = (ProjectCode | DesignProject) & { category: 'code' | 'design'; year?: string | number };
 
 const TABLE_TEXTURE = `
-  radial-gradient(circle at 50% 50%, rgba(20, 15, 30, 0.8) 0%, rgba(4, 3, 8, 1) 100%),
+  radial-gradient(circle at 50% 50%, rgba(18, 15, 28, 0.9) 0%, rgba(4, 3, 8, 1) 100%),
   linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
   linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E")
 `;
 
-const ROTATION_PATTERNS = [-1.5, 2, -2, 1.5, -1, 2.5];
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 8;
 
 export default function SelectedWorks() {
   const [filter, setFilter] = useState<'all' | 'code' | 'design'>('all');
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState<number>(ITEMS_PER_PAGE);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const allProjects = useMemo((): UnifiedProject[] => {
     const design = (designProjects as DesignProject[]).map(p => ({ ...p, category: 'design' as const }));
@@ -63,156 +60,208 @@ export default function SelectedWorks() {
   };
 
   return (
-    <section id="portfolio" className="bg-[#040308] py-28 md:py-36 relative overflow-hidden border-t border-white/5 text-white w-full max-w-full">
-      {/* Sfondo Glows in tonalità Cyan/Sky */}
-      <div className="absolute top-1/4 left-4 md:left-10 w-72 h-72 md:w-96 md:h-96 bg-cyan-600/10 blur-[140px] md:blur-[180px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-4 md:right-10 w-72 h-72 md:w-96 md:h-96 bg-sky-600/10 blur-[140px] md:blur-[180px] pointer-events-none" />
+    <section id="portfolio" className="bg-[#040308] py-32 md:py-40 relative overflow-hidden border-t border-white/5 text-white w-full max-w-full">
+      {/* Sfumature ambientali */}
+      <div className="absolute top-1/4 left-10 w-125 h-125 bg-neutral-800/10 blur-[220px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-10 w-125 h-125 bg-zinc-700/10 blur-[220px] pointer-events-none" />
 
-      {/* Grid Pattern Scrittoio */}
+      {/* Grid Texture */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-90"
+        className="absolute inset-0 pointer-events-none opacity-70"
         style={{ backgroundImage: TABLE_TEXTURE, backgroundSize: '100% 100%, 30px 30px, 30px 30px, 200px 200px' }}
       />
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 w-full">
 
-        {/* Header Sezione */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-16 border-b border-white/10 pb-10 gap-8 text-left">
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 text-cyan-400 font-mono text-[10px] tracking-[.4em] uppercase font-bold">
-              <CodeIcon size={14} /> ed ecco il Portfolio!
+        {/* Header essenziale */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 pb-10 border-b border-white/10 gap-8">
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/3 border border-white/10 text-zinc-300 font-mono text-[11px] tracking-[0.25em] uppercase">
+              <Sparkle size={12} weight="fill" /> Selected Works
             </div>
             
-            <h2 className="text-5xl md:text-8xl font-black italic uppercase tracking-tighter text-white">
-              Works<span className="text-cyan-400">.</span>
+            <h2 className="text-5xl sm:text-7xl md:text-8xl font-black uppercase tracking-tighter text-white">
+              Works<span className="text-zinc-500">.</span>
             </h2>
 
             <p 
-              className="text-cyan-200/95 text-xl md:text-2xl pt-1 -rotate-1"
+              className="text-zinc-400 text-xl md:text-2xl max-w-lg font-light"
               style={{ fontFamily: "'Caveat', cursive" }}
             >
-              "Una selezione curata dei miei progetti di codice e design."
+              "Forme geometriche fluide che scompaiono al passaggio del mouse."
             </p>
           </div>
 
-          {/* Filtri a Tab */}
-          <div className="flex items-center gap-4">
-            <div className="flex bg-zinc-900/90 border border-white/10 p-1.5 rounded-xl shadow-2xl backdrop-blur-md">
-              {(['all', 'code', 'design'] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => handleFilterChange(t)}
-                  className={`px-4 py-2 rounded-lg font-mono text-[10px] uppercase tracking-widest transition-all duration-300 cursor-pointer ${
-                    filter === t
-                      ? 'bg-cyan-400 text-zinc-950 font-bold shadow-md shadow-cyan-500/20'
-                      : 'text-zinc-400 hover:text-white'
-                  }`}
-                >
-                  {t === 'all' ? 'Tutti' : t}
-                </button>
-              ))}
-            </div>
+          {/* Filtri rapidi */}
+          <div className="flex items-center gap-1 bg-zinc-950/60 p-1.5 rounded-2xl border border-white/10 backdrop-blur-xl">
+            {(['all', 'code', 'design'] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => handleFilterChange(t)}
+                className={`px-5 py-2 rounded-xl font-mono text-xs uppercase tracking-widest transition-all duration-300 cursor-pointer ${
+                  filter === t
+                    ? 'bg-white text-zinc-950 font-bold shadow-lg shadow-white/10'
+                    : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                {t === 'all' ? 'Tutti' : t}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Griglia dei Progetti */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+        {/* Griglia */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
           <AnimatePresence mode="popLayout">
             {displayedProjects.map((project, index) => {
-              const rotateDeg = ROTATION_PATTERNS[index % ROTATION_PATTERNS.length];
-              const accent = project.accent ?? "#22d3ee";
-              const isHovered = hoveredId === project.id;
               const projectPath = project.category === 'code'
                 ? `/code/${project.id}`
                 : `/project/${project.id}`;
 
               const formattedTitle = project.title.replace(/_/g, ' ');
+              const shapeVariant = index % 5; // 5 forme geometriche differenti
+              const isHovered = hoveredId === `${project.category}-${project.id}`;
+              const projectYear = project.year || '2025';
 
               return (
                 <motion.div
                   key={`${project.category}-${project.id}`}
-                  initial={{ opacity: 0, scale: 0.9, y: 15 }}
-                  animate={{
-                    opacity: 1,
-                    scale: isHovered ? 1.02 : 1,
-                    rotate: isHovered ? 0 : rotateDeg,
-                    y: isHovered ? -8 : 0,
-                    zIndex: isHovered ? 30 : 10,
-                  }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                  className="relative cursor-pointer select-none w-full min-w-0"
-                  onMouseEnter={() => setHoveredId(project.id)}
-                  onMouseLeave={() => setHoveredId(null)}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="w-full"
                 >
-                  <Link to={projectPath} className="block h-full w-full min-w-0">
-                    
-                    {/* Polaroid Card */}
-                    <div className="relative bg-[#110f18] border border-white/10 p-4 pb-6 rounded-2xl shadow-2xl transition-all duration-300 group-hover:border-cyan-500/50 group-hover:shadow-[0_20px_50px_rgba(34,211,238,0.15)] w-full min-w-0">
+                  <Link 
+                    to={projectPath}
+                    onMouseEnter={() => setHoveredId(`${project.category}-${project.id}`)}
+                    onMouseLeave={() => setHoveredId(null)}
+                    className="group relative block aspect-3/4 w-full overflow-hidden rounded-3xl bg-zinc-900 border border-white/10 focus:outline-none transition-all duration-500 hover:border-white/30 hover:shadow-2xl"
+                  >
+                    {/* Immagine di copertina con zoom fluido */}
+                    <img
+                      src={project.image}
+                      alt={formattedTitle}
+                      loading="lazy"
+                      draggable={false}
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
 
-                      {/* Scotch in alto */}
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-20 h-5 bg-white/10 backdrop-blur-xs border border-white/10 rotate-1 shadow-xs pointer-events-none z-30" />
+                    {/* Sfumatura scura leggera all'hover */}
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/5 transition-colors duration-500" />
 
-                      {/* Badge Performance */}
-                      <div className="absolute top-7 left-7 z-20">
-                        <div className="bg-black/80 backdrop-blur-md px-2.5 py-1 rounded border border-white/10 flex items-center gap-1.5 shadow-lg">
-                          <LightningIcon size={10} weight="fill" style={{ color: accent }} />
-                          <span className="font-mono text-[8px] text-zinc-300 uppercase font-bold tracking-wider">
-                            {project.performance ? `Score: ${project.performance}` : 'Verified'}
-                          </span>
-                        </div>
-                      </div>
+                    {/* --- BADGE GEOMETRICI VARIABILI (Scompaiono all'hover) --- */}
 
-                      {/* Immagine Foto */}
-                      <div className="relative aspect-4/3 w-full overflow-hidden rounded-xl bg-black border border-white/5">
-                        <img
-                          src={project.image}
-                          alt={formattedTitle}
-                          loading="lazy"
-                          draggable={false}
-                          className="w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 group-hover:opacity-90 group-hover:scale-105 transition-all duration-500"
-                        />
-
-                        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent" />
-
-                        {/* Icona "Esplora" */}
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
-                          <span className="bg-cyan-400 text-zinc-950 font-mono text-[9px] uppercase font-bold tracking-widest px-3.5 py-2 rounded-full shadow-lg flex items-center gap-2">
-                            <MagnifyingGlassIcon size={14} weight="bold" />
-                            Apri Caso Studio
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Titolo e dettagli stilizzati a mano */}
-                      <div className="mt-4 px-1 flex items-end justify-between gap-2 min-w-0">
-                        <div className="space-y-0.5 min-w-0 flex-1">
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            {project.category === 'code' ? (
-                              <CodeIcon size={12} className="text-cyan-400 shrink-0" />
-                            ) : (
-                              <PaintBrushIcon size={12} className="text-sky-400 shrink-0" />
-                            )}
-                            <span className="font-mono text-[9px] uppercase tracking-widest text-cyan-400/80 font-bold truncate">
-                              {project.role}
+                    {/* 0: Cerchio Perfetto */}
+                    {shapeVariant === 0 && (
+                      <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+                        <motion.div 
+                          className="w-36 h-36 rounded-full bg-zinc-950/80 backdrop-blur-md text-white shadow-xl flex flex-col items-center justify-center text-center p-4 border border-white/15"
+                          animate={{ opacity: isHovered ? 0 : 1, scale: isHovered ? 0.95 : 1 }}
+                          transition={{ duration: 0.25, ease: "easeInOut" }}
+                        >
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 font-medium">
+                              {project.category}
                             </span>
+                            <span className="text-zinc-600 text-[9px]">•</span>
+                            <span className="font-mono text-[9px] text-zinc-500">{projectYear}</span>
                           </div>
-
-                          <h3 
-                            className="text-2xl font-bold text-white tracking-wide truncate"
-                            style={{ fontFamily: "'Caveat', cursive" }}
-                            title={formattedTitle}
-                          >
+                          <h3 className="text-xs md:text-sm font-bold tracking-tight uppercase leading-tight line-clamp-2 text-white/95">
                             {formattedTitle}
                           </h3>
-                        </div>
-
-                        <span className="font-mono text-[8px] text-zinc-500 uppercase border border-zinc-800 px-1.5 py-0.5 rounded shrink-0">
-                          #{project.id}
-                        </span>
+                        </motion.div>
                       </div>
+                    )}
 
-                    </div>
+                    {/* 1: Squircle (Angoli molto arrotondati) */}
+                    {shapeVariant === 1 && (
+                      <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+                        <motion.div 
+                          className="w-36 h-36 rounded-4xl bg-zinc-950/80 backdrop-blur-md text-white shadow-xl flex flex-col items-center justify-center text-center p-4 border border-white/15"
+                          animate={{ opacity: isHovered ? 0 : 1, scale: isHovered ? 0.95 : 1 }}
+                          transition={{ duration: 0.25, ease: "easeInOut" }}
+                        >
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 font-medium">
+                              {project.category}
+                            </span>
+                            <span className="text-zinc-600 text-[9px]">•</span>
+                            <span className="font-mono text-[9px] text-zinc-500">{projectYear}</span>
+                          </div>
+                          <h3 className="text-xs md:text-sm font-bold tracking-tight uppercase leading-tight line-clamp-2 text-white/95">
+                            {formattedTitle}
+                          </h3>
+                        </motion.div>
+                      </div>
+                    )}
+
+                    {/* 2: Asimmetrico / Organico (Border radius misto) */}
+                    {shapeVariant === 2 && (
+                      <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+                        <motion.div 
+                          className="w-38 h-34 rounded-[2.5rem_1rem_2.5rem_1rem] bg-zinc-950/80 backdrop-blur-md text-white shadow-xl flex flex-col items-center justify-center text-center p-4 border border-white/15"
+                          animate={{ opacity: isHovered ? 0 : 1, scale: isHovered ? 0.95 : 1 }}
+                          transition={{ duration: 0.25, ease: "easeInOut" }}
+                        >
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 font-medium">
+                              {project.category}
+                            </span>
+                            <span className="text-zinc-600 text-[9px]">•</span>
+                            <span className="font-mono text-[9px] text-zinc-500">{projectYear}</span>
+                          </div>
+                          <h3 className="text-xs md:text-sm font-bold tracking-tight uppercase leading-tight line-clamp-2 text-white/95">
+                            {formattedTitle}
+                          </h3>
+                        </motion.div>
+                      </div>
+                    )}
+
+                    {/* 3: Pillola Orizzontale */}
+                    {shapeVariant === 3 && (
+                      <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+                        <motion.div 
+                          className="w-44 h-28 rounded-full bg-zinc-950/80 backdrop-blur-md text-white shadow-xl flex flex-col items-center justify-center text-center px-6 py-3 border border-white/15"
+                          animate={{ opacity: isHovered ? 0 : 1, scale: isHovered ? 0.95 : 1 }}
+                          transition={{ duration: 0.25, ease: "easeInOut" }}
+                        >
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 font-medium">
+                              {project.category}
+                            </span>
+                            <span className="text-zinc-600 text-[9px]">•</span>
+                            <span className="font-mono text-[9px] text-zinc-500">{projectYear}</span>
+                          </div>
+                          <h3 className="text-xs md:text-sm font-bold tracking-tight uppercase leading-tight line-clamp-1 text-white/95">
+                            {formattedTitle}
+                          </h3>
+                        </motion.div>
+                      </div>
+                    )}
+
+                    {/* 4: Forma Diamante / Angoli morbidi */}
+                    {shapeVariant === 4 && (
+                      <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+                        <motion.div 
+                          className="w-36 h-36 rounded-3xl rotate-0 bg-zinc-950/80 backdrop-blur-md text-white shadow-xl flex flex-col items-center justify-center text-center p-4 border border-white/15"
+                          animate={{ opacity: isHovered ? 0 : 1, scale: isHovered ? 0.95 : 1 }}
+                          transition={{ duration: 0.25, ease: "easeInOut" }}
+                        >
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 font-medium">
+                              {project.category}
+                            </span>
+                            <span className="text-zinc-600 text-[9px]">•</span>
+                            <span className="font-mono text-[9px] text-zinc-500">{projectYear}</span>
+                          </div>
+                          <h3 className="text-xs md:text-sm font-bold tracking-tight uppercase leading-tight line-clamp-2 text-white/95">
+                            {formattedTitle}
+                          </h3>
+                        </motion.div>
+                      </div>
+                    )}
+
                   </Link>
                 </motion.div>
               );
@@ -220,28 +269,18 @@ export default function SelectedWorks() {
           </AnimatePresence>
         </div>
 
-        {/* Pulsante "Carica Altri" se ci sono altri progetti da mostrare */}
+        {/* Pulsante Carica Altri */}
         {visibleCount < filteredProjects.length && (
-          <div className="mt-16 text-center">
+          <div className="mt-20 text-center">
             <button
               onClick={handleLoadMore}
-              className="inline-flex items-center gap-2.5 px-8 py-4 rounded-xl bg-zinc-900/90 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-400 hover:text-zinc-950 font-mono text-xs uppercase tracking-widest font-bold transition-all duration-300 shadow-xl cursor-pointer group"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-zinc-950/80 border border-white/10 text-zinc-300 hover:text-white hover:border-white/30 font-mono text-xs uppercase tracking-widest font-bold transition-all duration-300 shadow-xl cursor-pointer group backdrop-blur-md"
             >
-              <span>Carica altri progetti ({filteredProjects.length - visibleCount} rimanenti)</span>
-              <ArrowDownIcon size={14} className="group-hover:translate-y-1 transition-transform" />
+              <span>Mostra altri ({filteredProjects.length - visibleCount})</span>
+              <ArrowDown size={14} className="group-hover:translate-y-1 transition-transform text-zinc-400" />
             </button>
           </div>
         )}
-
-        {/* Footer Sezione */}
-        <div className="mt-16 text-center border-t border-white/10 pt-8">
-          <p 
-            className="text-zinc-500 text-xl -rotate-1"
-            style={{ fontFamily: "'Caveat', cursive" }}
-          >
-            Visualizzati {displayedProjects.length} di {filteredProjects.length} progetti.
-          </p>
-        </div>
 
       </div>
     </section>

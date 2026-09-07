@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
-import { ListIcon, XIcon, GithubLogoIcon, LinkedinLogoIcon, SparkleIcon } from '@phosphor-icons/react';
+import { ListIcon, XIcon, GithubLogoIcon, LinkedinLogoIcon } from '@phosphor-icons/react';
 
 import logo from '../../assets/Background/FE logo.png';
 
@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { href: '#home', label: 'Home' },
   { href: '#about', label: 'About' },
   { href: '#skills', label: 'Skills' },
-  { href: '#portfolio', label: 'Works', isWip: true },
+  { href: '#portfolio', label: 'Works' },
   { href: '#contact', label: 'Contact' },
 ];
 
@@ -29,27 +29,6 @@ const AnimatedDoodle = () => (
       animate={{ pathLength: 1, opacity: 1 }}
       exit={{ pathLength: 0, opacity: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-    />
-  </svg>
-);
-
-// ✏️ SCRABOCCHIO DI SBARRAMENTO SOPRA "WORKS"
-const StrikeThroughDoodle = () => (
-  <svg
-    viewBox="0 0 120 30"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="absolute inset-0 w-full h-full text-cyan-400 pointer-events-none z-20 overflow-visible opacity-90"
-  >
-    <motion.path
-      d="M 5,20 C 30,5 70,25 115,8 M 15,12 C 50,28 85,2 110,18"
-      stroke="currentColor"
-      strokeWidth="2.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      initial={{ pathLength: 0, opacity: 0 }}
-      animate={{ pathLength: 1, opacity: 1 }}
-      transition={{ duration: 0.4, ease: "easeInOut" }}
     />
   </svg>
 );
@@ -97,33 +76,6 @@ export default function Navbar() {
           >
             {NAV_ITEMS.map((item, index) => {
               const isActive = activeSection === item.href;
-
-              // Se è la voce WIP (Works), non è cliccabile e ha lo scarabocchio sopra
-              if (item.isWip) {
-                return (
-                  <div
-                    key={item.label}
-                    onMouseEnter={() => setHoveredIndex(index)}
-                    onMouseLeave={() => setHoveredIndex(null)}
-                    className="relative px-3.5 py-1.5 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-zinc-600 cursor-not-allowed select-none group/wip"
-                  >
-                    {/* Testo barrato / oscurato */}
-                    <span className="relative z-10 line-through decoration-cyan-500/50 text-zinc-500">
-                      {item.label}
-                    </span>
-                    
-                    {/* Badge WIP Hype */}
-                    <span className="relative z-10 inline-flex items-center gap-1 bg-cyan-950/60 border border-cyan-500/30 text-cyan-400 px-2 py-0.5 rounded-full text-[9px] font-mono tracking-wider shadow-[0_0_8px_rgba(34,211,238,0.15)]">
-                      <SparkleIcon size={9} weight="fill" className="animate-pulse" /> WIP
-                    </span>
-
-                    {/* Scarabocchio/doodle animato sopra la scritta al passaggio del mouse */}
-                    <AnimatePresence>
-                      {hoveredIndex === index && <StrikeThroughDoodle />}
-                    </AnimatePresence>
-                  </div>
-                );
-              }
 
               return (
                 <a
@@ -206,20 +158,6 @@ export default function Navbar() {
           >
             <div className="flex flex-col gap-4">
               {NAV_ITEMS.map((item) => {
-                if (item.isWip) {
-                  return (
-                    <div
-                      key={item.label}
-                      className="text-sm uppercase tracking-widest py-2 flex items-center justify-between text-zinc-600 cursor-not-allowed select-none"
-                    >
-                      <span className="line-through decoration-cyan-500/50 text-zinc-500">{item.label}</span>
-                      <span className="inline-flex items-center gap-1 bg-cyan-950/60 border border-cyan-500/30 text-cyan-400 px-2 py-0.5 rounded-full text-[9px] font-mono tracking-wider shadow-[0_0_8px_rgba(34,211,238,0.15)]">
-                        ✦ WIP
-                      </span>
-                    </div>
-                  );
-                }
-
                 const isActive = activeSection === item.href;
                 return (
                   <a

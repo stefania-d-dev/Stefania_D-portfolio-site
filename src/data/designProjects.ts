@@ -41,10 +41,50 @@ export interface DesignProject {
   teamSize: string;
   originalBrief: string;
   strategicImpact: string;
+  projectScope?: string;
+  objective?: string;
+  approach?: string;
 }
 
 export const projects: DesignProject[] = [
-  {
+{
+  id: "brothers-club",
+  title: "Brother's Club",
+  logo: Assets.brothersLogo, 
+  agency: "Progetto Indipendente",
+  tagline: "Brand identity e coordinato visivo per il punto di riferimento TCG. 🃏",
+  designPhilosophy: "IL DESIGN AL SERVIZIO DELLA COMMUNITY. L'ESTETICA DEL GAMING COMPETITIVO SENZA COMPROMESSI.",
+  location: "Gravina di Catania, IT",
+  role: "Brand & Graphic Designer",
+  tech: ["Brand Identity", "Logo Design", "Brand Board", "Social Template", "Editorial Design"],
+  description: "Progetto di brand identity e coordinato grafico sviluppato in completa autonomia per Brother's Club, uno spazio dedicato ai giochi di carte collezionabili (TCG) e agli eventi competitivi. L'obiettivo è stato creare un'identità visiva forte, dinamica e riconoscibile.",
+  galleryImages: [
+    { url: Assets.brothersBB, caption: "Brand Board e Linee Guida", description: "Definizione della palette colori, dei font e del logo system." },
+    { url: Assets.BC_Info_Torneo_Standard1, caption: "Grafiche per Tornei", description: "Template puliti e coordinati per la comunicazione degli eventi di gioco." },
+    { url: Assets.BC_2026_07_CalendarioMensile, caption: "Calendario Mensile", description: "Organizzazione visiva degli appuntamenti e dei tornei del mese." },
+    { url: Assets.BC_Carosello_Panoramico_TopPulls_01, caption: "Caroselli Social 'Top Pulls' - Parte 1", description: "Inizio del carosello panoramico dedicato alle carte più rare sbustate in negozio." },
+    { url: Assets.BC_Carosello_Panoramico_TopPulls_02, caption: "Caroselli Social 'Top Pulls' - Parte 2", description: "Continuazione con il focus sulle carte speciali." },
+    { url: Assets.BC_Carosello_Panoramico_TopPulls_03, caption: "Caroselli Social 'Top Pulls' - Parte 3", description: "Chiusura del carosello con call to action e contatti." }
+  ],
+  videos: [], 
+  accent: "#FF4500", 
+  image: Assets.BC_Info_Torneo_Standard1,
+  performance: "Brand Identity Coerente // Community Engagement // Template Social Scalabili.",
+  designNote: "Creazione di un linguaggio visivo flessibile che permette al team di gestire in autonomia i contenuti ricorrenti senza perdere coerenza estetica.",
+  duration: "2026",
+  status: "Completed",
+  type: "Brand Identity & Visual System",
+  challenge: "Strutturare un'immagine coordinata professionale e accattivante, in grado di comunicare l'anima competitiva e aggregativa del brand, valorizzando al contempo la programmazione mensile.",
+  solution: "Definizione di un design system basato su palette cromatiche ad alto impatto, tipografia moderna (Bebas Neue e Montserrat) e creazione di template flessibili per la gestione social.",
+  lessonsLearned: "Fornire template strutturati e modularizzati è fondamentale per consentire ai clienti di mantenere un'alta qualità visiva anche nella gestione quotidiana.",
+  roleDetails: "In qualità di Designer unico, ho curato l'intero processo creativo: dallo studio del logo e della brand board fino alla produzione esecutiva dei materiali promozionali e social.",
+  teamSize: "Solo Designer",
+  originalBrief: "Sviluppare l'identità visiva e i materiali di comunicazione per un nuovo punto di riferimento locale per i TCG.",
+  strategicImpact: "Il nuovo sistema visivo ha permesso di elevare la percezione professionale del locale, attirando un numero maggiore di partecipanti ai tornei.",
+  visualLegacy: "Un'estetica riconoscibile che unisce i codici visivi del gaming competitivo a una pulizia tipografica di stampo moderno.",
+  category: "design"
+},
+{
     id: "animo-siciliano",
     title: "Animo_Siciliano",
     logo: Assets.LogoAnimo,
@@ -76,7 +116,7 @@ export const projects: DesignProject[] = [
     challenge: "Superare i cliché folk del settore agroalimentare locale per strutturare un linguaggio visivo rigoroso, elegante e credibile per i mercati esteri.",
     solution: "Ideazione di un Visual System basato sul contrasto tra texture organiche e geometrie tipografiche pulite, elevando il prodotto a eccellenza da collezione.",
     lessonsLearned: "Un'identità visiva ad alto impatto emotivo attrae segmenti di pubblico qualificati, ma richiede una direzione artistica continuativa per preservare il posizionamento di prezzo.",
-    roleDetails: "In qualità di Founding Creative, ho definiert l'intera Brand Architecture (dal naming al codice visivo), coordinando la produzione degli asset multimediali e la strategia di go-to-market.",
+    roleDetails: "In qualità di Founding Creative, ho definito l'intera Brand Architecture (dal naming al codice visivo), coordinando la produzione degli asset multimediali e la strategia di go-to-market.",
     teamSize: "Creative Lead",
     originalBrief: "Sviluppare l'infrastruttura di brand e la content strategy per il lancio di una piattaforma e-commerce direct-to-consumer.",
     strategicImpact: "Il passaggio da un modello puramente commerciale a un format di 'Boutique Editoriale' ha consentito il posizionamento del catalogo in una fascia di prezzo ad alto margine, intercettando un target internazionale colto.",
@@ -129,7 +169,7 @@ export const projects: DesignProject[] = [
     tagline: "Vibrazioni sane, radici siciliane. 🌸",
     designPhilosophy: "IL BENESSERE È UN'ESPLOSIONE CROMATICA. IL ROSA NEON LIBERA LA TRADIZIONE DALLA NOIA DEL MARRONE.",
     location: "Sicilia, IT",
-    accent: "#EC4899", // Rosa Neon assegnato per coerenza visual-disruption
+    accent: "#EC4899",
     status: "Completed",
     type: "Disruptive Agro-Branding",
     challenge: "Scardinare i codici cromatici standardizzati del settore biologico (verde/marrone) per posizionare il prodotto come oggetto ad alto valore di design e lifestyle.",
@@ -163,7 +203,7 @@ export const projects: DesignProject[] = [
     tagline: "L'arancia è #fimmina. 🍊",
     designPhilosophy: "LA SOTTRAZIONE COME FORMA DI POTERE. IL LUSSO NON HA BISOGNO DI URLARE PER ESSERE NOTATO.",
     location: "Sicilia, IT",
-    accent: "#EA580C", // Arancione scuro editoriale
+    accent: "#EA580C",
     status: "Completed",
     type: "Quiet Luxury Agriculture",
     challenge: "Modernizzare l'eredità storica del marchio senza alienarne i tratti identitari originari, riposizionando la produzione come offerta di nicchia adatta a mercati ad alto spendente.",
@@ -197,7 +237,7 @@ export const projects: DesignProject[] = [
     tagline: "Vedere oltre, apparire unici. 👓",
     designPhilosophy: "LA PRECISIONE CHIRURGICA INCONTRA IL DESIGN EDITORIALE. EDUCARE ALLA VISIONE ATTRAVERSO LA CHIAREZZA.",
     location: "Catania, IT",
-    accent: "#0284C7", // Medical Tech Blue
+    accent: "#0284C7",
     status: "Active",
     type: "Clinical Information Design",
     challenge: "Evidenziare il valore differenziante della strumentazione Zeiss e dell'équipe medica all'interno di un mercato competitivo sbilanciato sul fattore prezzo.",
@@ -230,7 +270,7 @@ export const projects: DesignProject[] = [
     tagline: "La Sicilia in un sapore, in un gesto, in un gioiello. 🍋",
     designPhilosophy: "IL DESIGN COME MOTORE DI CONVERSIONE. LA VERACITÀ SICILIANA TRADOTTA IN ORDINE VISIVO.",
     location: "Sicilia, IT",
-    accent: "#059669", // Verde Smeraldo Mediterraneo
+    accent: "#059669",
     status: "Completed",
     type: "Brand Unification Strategy",
     challenge: "Standardizzare la comunicazione di un catalogo merceologico eterogeneo (food e gioielli d'artigianato), prevenendo la frammentazione del brand ed evitando la confusione d'acquisto nell'utente finale.",
@@ -250,7 +290,7 @@ export const projects: DesignProject[] = [
     originalBrief: "Implementare la visibilità del catalogo prodotti sui canali di interazione sociale per sostenere le vendite dell'e-shop.",
     strategicImpact: "Conversione di una gamma di articoli disomogenei in una 'Curated Selection' coerente. L'operazione ha incrementato la percezione di valore complessiva, validando la coesistenza delle linee merceologiche.",
     visualLegacy: "Dimostrazione di come l'applicazione di una metodologia strategica possa ricondurre segmenti produttivi distanti sotto un unico DNA di brand.",
-    category: "marketing" // Modificato in marketing per bilanciare il filtro dell'applicazione hub
+    category: "marketing"
   },
   {
     id: "interlandi-tende",
@@ -264,7 +304,7 @@ export const projects: DesignProject[] = [
     tagline: "Architetture di luce e ombra. ☀️",
     designPhilosophy: "TRASFORMARE IL LIMITE IN STILE. IL PRODOTTO STATICO DIVENTA UNA NARRAZIONE DINAMICA DI BENESSERE.",
     location: "Sicilia, IT",
-    accent: "#4B5563", // Grigio Antracite Tecnico
+    accent: "#4B5563",
     status: "Completed",
     type: "B2B Industrial Positioning",
     challenge: "Garantire un flusso di comunicazione costante ed elevato per prodotti a ciclo d'acquisto lungo e fortemente tecnici, operando in regime di piena autonomia creativa.",
