@@ -1,6 +1,5 @@
-import React, { useState, memo, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import React, { memo, useEffect, useState } from 'react';
+import { motion, useAnimation } from 'framer-motion';
 import {
   ArrowUpRightIcon,
   FileTextIcon,
@@ -8,280 +7,422 @@ import {
   PaletteIcon,
   MapPinIcon,
   SparkleIcon,
-  HeartIcon,
-  TerminalWindowIcon,
   FigmaLogoIcon,
 } from '@phosphor-icons/react';
 
+// Importa l'immagine direttamente (path string per Vite)
 import profileImg from '../../assets/Background/stefania_avatar.webp';
 
-// Import dinamico del font Google "Caveat" per evitare il fallback su Comic Sans
-const fontImport = document.createElement('link');
-fontImport.href = 'https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap';
-fontImport.rel = 'stylesheet';
-if (!document.head.contains(fontImport)) {
-  document.head.appendChild(fontImport);
-}
-
-interface StaticImageData {
-  src: string;
-  width?: number;
-  height?: number;
-}
-
-const AVATAR_FALLBACK_WIDTH = 720;
-const AVATAR_FALLBACK_HEIGHT = 960;
+/* ─────────────────────────────────────────────────────────────
+    CONSTANTS & STYLES
+───────────────────────────────────────────────────────────── */
 
 const RESUME_DRIVE_URL =
   'https://drive.google.com/file/d/1cxDTR6DlQrU64nTDkGBIhwZXtNjoBLRQ/view?usp=sharing';
 
-// ── 🌋 DOODLE ETNA ────────────────────────────────────────────────────────────
+const EASE_SMOOTH = [0.22, 1, 0.36, 1] as const;
 
-const EtnaDoodle = memo(({ className = 'w-8 h-auto text-sky-400' }: { className?: string }) => (
-  <svg
-    viewBox="0 0 80 60"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-hidden="true"
-    className={`${className} transition-transform duration-300 hover:scale-110 shrink-0`}
-  >
-    <path
-      d="M45 15C45 10 50 8 48 3M52 18C55 12 60 10 57 4"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-    <path
-      d="M5 55L35 20L45 25L55 18L85 55"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-));
-EtnaDoodle.displayName = 'EtnaDoodle';
+const handwrittenStyle = {
+  fontFamily: "'Caveat', cursive, sans-serif",
+};
+
+/* ─────────────────────────────────────────────────────────────
+    HELPERS & HOOKS
+───────────────────────────────────────────────────────────── */
+
+const usePrefersReducedMotion = () => {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handler = (event: MediaQueryListEvent) => {
+      setPrefersReducedMotion(event.matches);
+    };
+
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  return prefersReducedMotion;
+};
+
+/* ─────────────────────────────────────────────────────────────
+    SUB-COMPONENTS (Memoized per performance)
+───────────────────────────────────────────────────────────── */
 
 const HandDrawnUnderline = memo(() => (
   <svg
-    viewBox="0 0 180 20"
+    viewBox="0 0 240 22"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     preserveAspectRatio="none"
     aria-hidden="true"
-    className="w-full h-3 text-sky-400 absolute -bottom-1 left-0 pointer-events-none z-10"
+    className="absolute -bottom-2 left-0 h-4 w-full pointer-events-none"
   >
     <motion.path
-      d="M2 12C40 4 100 3 178 14M20 16C60 10 120 8 160 17"
+      d="M3 13C45 5 110 4 237 14"
       stroke="currentColor"
-      strokeWidth="2.5"
+      strokeWidth="2.8"
       strokeLinecap="round"
       initial={{ pathLength: 0, opacity: 0 }}
       animate={{ pathLength: 1, opacity: 1 }}
-      exit={{ pathLength: 0, opacity: 0 }}
-      transition={{ duration: 0.35, ease: 'easeOut' }}
+      transition={{
+        duration: 0.7,
+        delay: 0.35,
+        ease: 'easeOut',
+      }}
+    />
+    <motion.path
+      d="M28 18C86 11 153 10 211 18"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      initial={{ pathLength: 0, opacity: 0 }}
+      animate={{ pathLength: 1, opacity: 0.65 }}
+      transition={{
+        duration: 0.55,
+        delay: 0.65,
+        ease: 'easeOut',
+      }}
     />
   </svg>
 ));
 HandDrawnUnderline.displayName = 'HandDrawnUnderline';
 
-// Badge che esplodono fuori dalla foto
-const DOODLES = [
-  { id: 'react', label: '<React & TS />', x: -160, y: -100, rotate: -12, icon: TerminalWindowIcon, color: 'text-sky-400 border-sky-400/40' },
-  { id: 'figma', label: 'UI/UX Design', x: 160, y: -110, rotate: 14, icon: FigmaLogoIcon, color: 'text-purple-400 border-purple-400/40' },
-  { id: 'sparkle', label: 'Cura dei Dettagli ✨', x: -170, y: 80, rotate: -8, icon: SparkleIcon, color: 'text-amber-300 border-amber-300/40' },
-  { id: 'etna', label: 'Etna Vibe 🌋', x: 160, y: 90, rotate: 10, icon: MapPinIcon, color: 'text-rose-400 border-rose-400/40' },
-  { id: 'love', label: 'Clean Code 💻', x: 0, y: -180, rotate: 0, icon: HeartIcon, color: 'text-emerald-400 border-emerald-400/40' },
+/* ─────────────────────────────────────────────────────────────
+    DATA ARRAYS
+───────────────────────────────────────────────────────────── */
+
+const FLOATING_DOODLES = [
+  { icon: '✦', color: 'text-[#F6C555]', pos: 'left-[3%] top-[18%]', size: 'text-2xl', delay: 0.9 },
+  { icon: '✿', color: 'text-[#B79FDB]', pos: 'right-[7%] top-[15%]', size: 'text-xl', delay: 1.05 },
+  { icon: '♥', color: 'text-[#F5A6C6]', pos: 'left-[9%] bottom-[18%]', size: 'text-lg', delay: 1.2 },
+  { icon: '✦', color: 'text-[#9BD8B8]', pos: 'right-[4%] bottom-[20%]', size: 'text-lg', delay: 1.35 },
 ];
 
-// ── 🚀 COMPONENTE HERO ──────────────────────────────────────────────────────
+// Sticker editoriali posizionati stabilmente attorno al ritratto
+const EDITORIAL_STICKERS = [
+  {
+    label: 'Frontend × Design',
+    icon: SparkleIcon,
+    pos: '-left-6 top-[18%]',
+    rot: -3,
+    color: '#B79FDB',
+  },
+  {
+    label: 'React & TS',
+    icon: CodeIcon,
+    pos: '-right-6 bottom-[24%]',
+    rot: 4,
+    color: '#8FC1E3',
+  },
+];
+
+// 3 Doodle fissi di contorno vicino al ritratto
+const PORTRAIT_DOODLES = [
+  { icon: '✦', pos: '-left-4 -top-4', color: 'text-[#F6C555]', size: 'text-xl' },
+  { icon: '✿', pos: '-right-3 top-[45%]', color: 'text-[#B79FDB]', size: 'text-lg' },
+  { icon: '♥', pos: 'left-[15%] -bottom-4', color: 'text-[#F5A6C6]', size: 'text-base' },
+];
+
+const SKILLS_LIST = [
+  { label: 'Front-End Development', icon: CodeIcon },
+  { label: 'Web Design & UX', icon: PaletteIcon },
+  { label: 'Catania, Sicily', icon: MapPinIcon },
+];
+
+/* ─────────────────────────────────────────────────────────────
+    MOTION VARIANTS
+───────────────────────────────────────────────────────────── */
+
+const heroContainer = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+const revealUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: EASE_SMOOTH },
+  },
+};
+
+const revealTitle = {
+  hidden: { opacity: 0, y: 45 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 1, ease: EASE_SMOOTH },
+  },
+};
+
+const imageReveal = {
+  hidden: { opacity: 0, scale: 0.95, y: 20 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: 1.1, ease: EASE_SMOOTH },
+  },
+};
+
+/* ─────────────────────────────────────────────────────────────
+    COMPONENT
+───────────────────────────────────────────────────────────── */
 
 export default function BackgroundImgHome() {
-  const [isTitleHovered, setIsTitleHovered] = useState(false);
-  const [isPhotoHovered, setIsPhotoHovered] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const controls = useAnimation();
 
   useEffect(() => {
-    const checkScreen = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    checkScreen();
-    window.addEventListener('resize', checkScreen);
-    return () => window.removeEventListener('resize', checkScreen);
-  }, []);
+    if (prefersReducedMotion) {
+      controls.stop();
+    } else {
+      controls.start('animate');
+    }
+  }, [prefersReducedMotion, controls]);
 
-  const profileUrl = typeof profileImg === 'string' ? profileImg : (profileImg as StaticImageData).src;
-  const profileWidth = typeof profileImg === 'string' ? AVATAR_FALLBACK_WIDTH : (profileImg as StaticImageData).width ?? AVATAR_FALLBACK_WIDTH;
-  const profileHeight = typeof profileImg === 'string' ? AVATAR_FALLBACK_HEIGHT : (profileImg as StaticImageData).height ?? AVATAR_FALLBACK_HEIGHT;
-
-  const handwrittenStyle = { fontFamily: "'Caveat', cursive, sans-serif" };
+  const statusDotAnim = {
+    animate: {
+      scale: [1, 1.25, 1],
+      opacity: [1, 0.6, 1],
+      transition: {
+        duration: 2,
+        repeat: Infinity,
+        ease: 'easeInOut' as const,
+      },
+    },
+  };
 
   return (
     <section
-      className="relative w-full min-h-[85vh] lg:min-h-[90vh] flex items-center bg-[#080a10] text-zinc-100 font-sans pt-24 pb-16 lg:pt-32 lg:pb-24 px-6 sm:px-12 lg:px-20 selection:bg-sky-500/20 selection:text-sky-200 overflow-visible"
       aria-label="Stefania Deliso - Front-end Developer & Designer"
+      className="relative isolate flex min-h-[calc(100vh-4rem)] w-full items-center overflow-hidden bg-[#1E2022] px-6 py-24 text-[#E6E8EB] selection:bg-[#B79FDB]/30 selection:text-[#E6E8EB] sm:px-10 lg:min-h-screen lg:px-16 lg:py-28 xl:px-20"
     >
-      <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center relative z-10">
-        
-        {/* ── COLONNA SINISTRA: PRESENTAZIONE ── */}
-        <div className="lg:col-span-7 flex flex-col items-start text-left space-y-5 lg:space-y-6">
+      {/* AMBIENT BACKGROUND GLOWS */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-20 overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.8, ease: EASE_SMOOTH }}
+          className="absolute left-[48%] top-[36%] h-168 w-2xl -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#B79FDB]/8 blur-[120px]"
+        />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 2, delay: 0.25 }}
+          className="absolute -right-32 top-1/4 h-72 w-72 rounded-full bg-[#F6C555]/8 blur-[100px]"
+        />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 2, delay: 0.4 }}
+          className="absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-[#F5A6C6]/6 blur-[110px]"
+        />
+      </div>
+
+      {/* FLOATING DOODLES */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        {FLOATING_DOODLES.map((d) => (
+          <motion.span
+            key={d.delay}
+            className={`absolute ${d.pos} ${d.size} ${d.color} select-none`}
+            initial={{ opacity: 0, scale: 0, rotate: -20 }}
+            animate={
+              prefersReducedMotion
+                ? { opacity: 0.85, scale: 1, rotate: 0 }
+                : {
+                    opacity: [0, 1, 0.85],
+                    scale: [0, 1.15, 1],
+                    rotate: [-20, 8, 0],
+                  }
+            }
+            transition={{
+              duration: 1.2,
+              delay: d.delay,
+              ease: EASE_SMOOTH,
+            }}
+          >
+            {d.icon}
+          </motion.span>
+        ))}
+      </div>
+
+      {/* MAIN CONTENT GRID */}
+      <motion.div
+        variants={heroContainer}
+        initial="hidden"
+        animate="visible"
+        className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-16 lg:grid-cols-12 lg:gap-10 xl:gap-20"
+      >
+        {/* LEFT — TEXT CONTENT */}
+        <div className="relative z-10 flex flex-col items-start lg:col-span-7 xl:col-span-7">
           
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-zinc-800/80 bg-[#0e121d] text-xs font-mono text-zinc-300 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>Disponibile per posizioni in-house o remote</span>
-          </div>
+          {/* Availability Pill */}
+          <motion.div variants={revealUp}>
+            <div className="mb-7 inline-flex items-center gap-2.5 border-b border-white/10 pb-2 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-[#A0A8B0]">
+              <motion.span
+                aria-label="Stato: Disponibile"
+                className="h-2 w-2 rounded-full bg-[#7FB89B]"
+                animate={prefersReducedMotion ? 'initial' : statusDotAnim.animate}
+              />
+              <span>Sto cercando il prossimo progetto giusto</span>
+            </div>
+          </motion.div>
 
-          <div className="relative">
-            <h1
-              onMouseEnter={() => setIsTitleHovered(true)}
-              onMouseLeave={() => setIsTitleHovered(false)}
-              className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08] text-white cursor-default"
-            >
-              Ciao, sono <span className="text-zinc-400 font-normal">Stefania.</span>
-              <br />
-              <span className="text-white">Unisco </span>
-              <span className="relative inline-block text-sky-400 font-black">
-                Codice
-                <AnimatePresence>
-                  {isTitleHovered && <HandDrawnUnderline />}
-                </AnimatePresence>
+          {/* Main Title */}
+          <motion.div variants={revealTitle} className="relative max-w-4xl">
+            <h1 className="font-serif text-[3.5rem] font-medium leading-[0.94] tracking-[-0.045em] text-white sm:text-[5rem] lg:text-[5.4rem] xl:text-[6.25rem]">
+              <span className="block">Ciao, sono</span>
+              <span className="relative mt-2 block w-fit">
+                <span className="relative z-10">Stefania.</span>
+                <span aria-hidden="true" className="absolute -bottom-1 left-[2%] h-4 w-[94%] -rotate-1 rounded-full bg-[#F5A6C6]/30" />
               </span>
-              <span className="text-white"> & Design.</span>
+              <span className="mt-4 block">
+                designer che{' '}
+                <span className="relative inline-block font-semibold text-[#C4B2E3]">
+                  scrive anche
+                  <HandDrawnUnderline />
+                </span>
+              </span>
+              <span className="block">
+                <span className="text-white">il suo codice</span>
+              </span>
             </h1>
-
-            {/* NOTA A MANO (Font Caveat) */}
-            <span
-              className="absolute -bottom-7 right-2 text-xl text-sky-300 font-bold rotate-1 hidden sm:block pointer-events-none select-none tracking-wide"
+            <motion.span
+              initial={{ opacity: 0, rotate: 5, x: 10 }}
+              animate={{ opacity: 1, rotate: 2, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.85, ease: EASE_SMOOTH }}
+              className="absolute -bottom-10 right-0 hidden text-xl font-bold tracking-wide text-[#C4B2E3] sm:block lg:-right-4"
               style={handwrittenStyle}
             >
-              ~ con tanta cura per i dettagli! 🧐
-            </span>
+              ...e sì, controllo anche gli allineamenti a 1px 👀
+            </motion.span>
+          </motion.div>
 
-          </div>
+          {/* Description */}
+          <motion.p variants={revealUp} className="mt-12 max-w-2xl text-base leading-[1.75] text-[#A0A8B0] sm:text-lg">
+            Lavoro con{' '}
+            <strong className="font-semibold text-white">React e TypeScript</strong>
+            , ma la parte che mi piace di più è quella in mezzo: prendere un'idea nata su Figma 
+            e trasformarla in qualcosa che funziona bene, oltre a stare bene. Mi trovo a mio agio con team creativi che non hanno paura di sperimentare.
+          </motion.p>
 
-          <p className="text-base sm:text-lg text-zinc-300 font-normal leading-relaxed max-w-2xl pt-1">
-            Sviluppo interfacce in <strong className="text-white font-medium">React e TypeScript</strong> prestando la massima cura al dettaglio visivo e alla UX. Amo collaborare con team creativi e dinamici, trasformando idee complesse su Figma in prodotti web funzionali, ordinati e belli da usare.
-          </p>
+          {/* Skills */}
+          <motion.div variants={revealUp} className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] font-mono uppercase tracking-[0.08em] text-[#A0A8B0]">
+            {SKILLS_LIST.map((skill, idx) => {
+              const IconComponent = skill.icon;
+              return (
+                <div key={idx} className="flex items-center gap-1.5">
+                  <IconComponent className="h-3.5 w-3.5 text-[#C4B2E3]" aria-hidden="true" />
+                  <span>{skill.label}</span>
+                </div>
+              );
+            })}
+          </motion.div>
 
-          {/* PILLOLE STACK + ETNA DOODLE */}
-          <div className="flex flex-wrap items-center gap-3 pt-1 font-mono text-xs text-zinc-300">
-            <span className="px-3 py-1.5 bg-[#0e121d] border border-zinc-800/80 rounded-lg flex items-center gap-1.5">
-              <CodeIcon size={15} className="text-sky-400" /> React • TypeScript • Tailwind
-            </span>
-            <span className="px-3 py-1.5 bg-[#0e121d] border border-zinc-800/80 rounded-lg flex items-center gap-1.5">
-              <PaletteIcon size={15} className="text-sky-400" /> UI/UX • Figma
-            </span>
-            
-            <div className="px-3.5 py-1.5 bg-[#0e121d] border border-sky-500/30 rounded-lg flex items-center gap-2 shadow-sm">
-              <EtnaDoodle className="w-7 h-auto text-sky-400 -rotate-6" />
-              <span className="text-zinc-200 font-bold text-[11px] flex items-center gap-1">
-                <MapPinIcon size={13} className="text-sky-400" /> Catania, Sicilia 🌋
-              </span>
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="flex flex-wrap items-center gap-4 pt-3 w-full sm:w-auto">
+          {/* Action Buttons */}
+          <motion.div variants={revealUp} className="mt-10 flex flex-wrap items-center gap-4">
             <a
-              href="#projects"
-              className="px-6 py-3.5 bg-zinc-100 hover:bg-white text-zinc-950 font-mono text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-sky-500/10 active:scale-95"
+              href="#works"
+              className="group inline-flex items-center gap-2.5 rounded-full bg-white px-7 py-4 text-sm font-medium text-[#1E2022] transition-all duration-300 hover:bg-[#E6E8EB] hover:shadow-lg hover:shadow-black/20"
             >
-              <SparkleIcon size={16} weight="fill" className="text-sky-500" />
-              Esplora i Progetti
-              <ArrowUpRightIcon size={16} weight="bold" />
+              <span>Esplora i progetti</span>
+              <ArrowUpRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
             </a>
 
             <a
               href={RESUME_DRIVE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3.5 bg-[#0e121d] hover:bg-zinc-800/60 border border-zinc-800 text-zinc-200 hover:text-white font-mono text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-2"
+              className="group inline-flex items-center gap-2.5 rounded-full border border-white/25 bg-transparent px-7 py-4 text-sm font-medium text-white transition-all duration-300 hover:border-white hover:bg-white/10"
             >
-              <FileTextIcon size={16} className="text-sky-400" />
-              Scarica il CV
+              <FileTextIcon className="h-4 w-4 text-[#A0A8B0] transition-colors group-hover:text-white" aria-hidden="true" />
+              <span>Leggi il CV</span>
             </a>
-          </div>
+          </motion.div>
 
         </div>
 
-        {/* ── COLONNA DESTRA: FOTO LIBERA + ESPLOSIONE + NOTA A MANO ── */}
-        <div className="lg:col-span-5 flex justify-center lg:justify-end relative mt-4 lg:mt-0">
-          
-          <div
-            onMouseEnter={() => setIsPhotoHovered(true)}
-            onMouseLeave={() => setIsPhotoHovered(false)}
-            className="relative w-full max-w-xs sm:max-w-sm flex flex-col items-center justify-end cursor-pointer group"
-          >
+        {/* RIGHT — EDITORIAL ORGANIC PORTRAIT & STABLE STICKERS */}
+        <div className="relative flex items-center justify-center lg:col-span-5 lg:col-start-8 xl:col-span-5 xl:col-start-8">
+          <motion.div variants={imageReveal} className="relative w-full max-w-sm sm:max-w-md py-6">
             
-            {/* Soft Ambient Glow */}
+            {/* Glow soffuso dietro la forma */}
             <div
-              className={`absolute inset-0 bg-linear-to-t from-sky-500/25 via-sky-500/10 to-transparent rounded-full blur-3xl transition-all duration-500 -z-10 ${
-                isPhotoHovered ? 'opacity-100 scale-125' : 'opacity-40'
-              }`}
+              aria-hidden="true"
+              className="absolute inset-0 -z-10 rounded-[42%_58%_55%_45%/50%_45%_55%_50%] bg-linear-to-tr from-[#B79FDB]/20 via-[#2B2D31] to-[#F6C555]/15 blur-2xl transform scale-110"
             />
 
-            {/* ESPLOSIONE DOODLE */}
-            <AnimatePresence>
-              {isPhotoHovered &&
-                DOODLES.map((doodle) => {
-                  const Icon = doodle.icon;
-                  return (
-                    <motion.div
-                      key={doodle.id}
-                      initial={{ opacity: 0, scale: 0.2, x: 0, y: 0 }}
-                      animate={{
-                        opacity: 1,
-                        scale: 1,
-                        x: doodle.x,
-                        y: doodle.y,
-                        rotate: doodle.rotate,
-                      }}
-                      exit={{ opacity: 0, scale: 0.2, x: 0, y: 0 }}
-                      transition={{ type: 'spring', stiffness: 280, damping: 20 }}
-                      className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#0e121d]/95 backdrop-blur-md border shadow-2xl text-xs font-mono font-bold whitespace-nowrap ${doodle.color}`}
-                    >
-                      <Icon size={16} weight="bold" />
-                      <span>{doodle.label}</span>
-                    </motion.div>
-                  );
-                })}
-            </AnimatePresence>
-
-            {/* FOTO LIBERA */}
+            {/* Contenitore con forma organica (border-radius irregolare), micro-rotazione e leggerissimo float in y */}
             <motion.div
-              animate={{ scale: isPhotoHovered ? 1.04 : 1 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="relative w-full z-20 flex justify-center"
+              animate={prefersReducedMotion ? {} : { y: [0, -6, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+              className="relative rotate-1 transition-transform duration-500 hover:rotate-0 hover:scale-[1.01]"
             >
-              <img
-                src={profileUrl}
-                width={profileWidth}
-                height={profileHeight}
-                alt="Stefania Deliso"
-                loading="eager"
-                decoding="async"
-                fetchPriority="high"
-                className="w-full h-auto object-cover filter contrast-[1.03] brightness-[1.02] drop-shadow-[0_25px_35px_rgba(0,0,0,0.7)]"
-              />
+              {/* Cornice organica principale */}
+              <div className="relative overflow-hidden rounded-[36%_64%_58%_42%/48%_52%_48%_52%] border-2 border-white/15 bg-[#25282C] shadow-xl shadow-black/30 aspect-4/5">
+                <img
+                  src={profileImg}
+                  alt="Stefania Deliso"
+                  className="h-full w-full object-cover object-center scale-[1.03] transition-transform duration-700 hover:scale-105"
+                />
+              </div>
+
+              {/* 3 Doodle fissi posionati a ridosso del ritratto */}
+              <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+                {PORTRAIT_DOODLES.map((d, index) => (
+                  <span
+                    key={index}
+                    className={`absolute ${d.pos} ${d.size} ${d.color} select-none drop-shadow-md`}
+                  >
+                    {d.icon}
+                  </span>
+                ))}
+              </div>
             </motion.div>
 
-            {/* NOTA A MANO SOTTO LA FOTO (nascosta su mobile) */}
-            {!isMobile && (
-              <div className="pt-3 text-center z-20 h-8 flex items-center justify-center">
-                <span
-                  className="text-xl text-sky-300 font-bold -rotate-2 inline-block select-none transition-transform group-hover:scale-105 tracking-wide"
-                  style={handwrittenStyle}
+            {/* Sticker editoriali fissi e stabili */}
+            {EDITORIAL_STICKERS.map((st, i) => {
+              const StickerIcon = st.icon;
+              return (
+                <div
+                  key={i}
+                  className={`absolute ${st.pos} z-20 hidden sm:flex items-center gap-2 rounded-2xl bg-[#2B2D31]/95 px-4 py-2.5 shadow-lg shadow-black/25 backdrop-blur-md border border-white/10 transition-transform duration-300 hover:scale-105`}
+                  style={{ rotate: `${st.rot}deg` }}
                 >
-                  {isPhotoHovered ? '💥 Boom! Ecco la mia Vibe 💫' : '🪄 Passa il mouse per scoprire i dettagli!'}
-                </span>
-              </div>
-            )}
+                  <StickerIcon className="h-4 w-4" style={{ color: st.color }} aria-hidden="true" />
+                  <span className="font-mono text-xs font-semibold text-white">{st.label}</span>
+                </div>
+              );
+            })}
 
-          </div>
-
+          </motion.div>
         </div>
 
+      </motion.div>
+
+      {/* SCROLL INDICATOR */}
+      <div aria-hidden="true" className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 items-center gap-2 lg:flex">
+        <motion.div
+          animate={prefersReducedMotion ? {} : { y: [0, 6, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          className="flex flex-col items-center gap-1 opacity-40 hover:opacity-100 transition-opacity"
+        >
+          <span className="font-mono text-[10px] uppercase tracking-widest text-[#E6E8EB]">Scroll</span>
+          <div className="h-4 w-0.5 rounded-full bg-[#E6E8EB]" />
+        </motion.div>
       </div>
+
     </section>
   );
 }

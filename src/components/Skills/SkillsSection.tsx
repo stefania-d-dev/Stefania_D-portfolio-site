@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion';
 
 // Import Hard Skills Icons
@@ -38,7 +38,9 @@ import mum from '../../assets/Icons/Soft/motherhood.png';
 import music from '../../assets/Icons/Soft/woman.png';
 import teamwork from '../../assets/Icons/Soft/motivation.png';
 
-const NOISE_PATTERN = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' strokeTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E")`;
+const PAPER_GRAIN = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' strokeTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E")`;
+const handwritten = { fontFamily: "'Caveat', cursive" };
+const display = { fontFamily: "'Fraunces', ui-serif, Georgia, serif" };
 
 interface SkillItem {
   name: string;
@@ -47,14 +49,26 @@ interface SkillItem {
 
 interface SkillCategory {
   title: string;
+  windowTitle: string;
+  subtitle: string;
   accent: string;
   skills: SkillItem[];
+}
+
+interface SoftSkillItem {
+  title: string;
+  windowTitle: string;
+  desc: string;
+  accent: string;
+  icon: string;
 }
 
 const HARD_SKILLS_CATEGORIES: SkillCategory[] = [
   {
     title: 'Programming Languages',
-    accent: '#22d3ee',
+    windowTitle: 'Core_Languages.ts',
+    subtitle: 'Le fondamenta logiche per costruire la struttura di ogni applicazione.',
+    accent: '#B79FDB',
     skills: [
       { name: 'C', icon: c },
       { name: 'JavaScript', icon: javascript },
@@ -62,8 +76,10 @@ const HARD_SKILLS_CATEGORIES: SkillCategory[] = [
     ],
   },
   {
-    title: 'Front-End',
-    accent: '#38bdf8',
+    title: 'Front-End Architecture',
+    windowTitle: 'FrontEnd_UI.tsx',
+    subtitle: 'Dove il design prende vita attraverso interfacce reattive e fluide.',
+    accent: '#F5A6C6',
     skills: [
       { name: 'HTML5', icon: html },
       { name: 'CSS3', icon: css },
@@ -74,8 +90,10 @@ const HARD_SKILLS_CATEGORIES: SkillCategory[] = [
     ],
   },
   {
-    title: 'Back-End (Beginner)',
-    accent: '#a855f7',
+    title: 'Back-End & Cloud',
+    windowTitle: 'Backend_Cloud.env',
+    subtitle: 'La gestione dei dati e dei servizi dietro le quinte.',
+    accent: '#9BD8B8',
     skills: [
       { name: 'Node.js', icon: node },
       { name: 'MongoDB', icon: mongoDb },
@@ -84,8 +102,10 @@ const HARD_SKILLS_CATEGORIES: SkillCategory[] = [
     ],
   },
   {
-    title: 'Design & Graphics',
-    accent: '#ec4899',
+    title: 'UX/UI & Design Tools',
+    windowTitle: 'Design_System.fig',
+    subtitle: 'Creare estetica, wireframe e identità visive curate nei minimi dettagli.',
+    accent: '#8FC1E3',
     skills: [
       { name: 'Figma', icon: figma },
       { name: 'Photoshop', icon: photoshop },
@@ -95,8 +115,10 @@ const HARD_SKILLS_CATEGORIES: SkillCategory[] = [
     ],
   },
   {
-    title: 'Other Tools & Workflow',
-    accent: '#facc15',
+    title: 'Workflow & Dev Tools',
+    windowTitle: 'Workflow_Env.json',
+    subtitle: 'Gli strumenti quotidiani per ottimizzare il flusso di lavoro.',
+    accent: '#FBEFA8',
     skills: [
       { name: 'VS Code', icon: vscode },
       { name: 'GitHub', icon: github },
@@ -110,187 +132,312 @@ const HARD_SKILLS_CATEGORIES: SkillCategory[] = [
   },
 ];
 
-const SOFT_SKILLS = [
+const SOFT_SKILLS: SoftSkillItem[] = [
   {
     title: 'Time Management & Organizzazione',
+    windowTitle: 'Time_Management.md',
     desc: 'Gestire priorità complesse, scadenze serrate e imprevisti quotidiani con un’efficienza e una lucidità da project manager.',
+    accent: '#F5A6C6',
     icon: mum,
-    tapeColor: 'rgba(251, 191, 36, 0.35)',
-    rotation: 'rotate-[-1deg]',
   },
   {
     title: 'Lavoro di Squadra & Empatia',
+    windowTitle: 'Teamwork.config',
     desc: 'Collaborare fianco a fianco con gli altri, comunicando in modo chiaro e unendo le idee per remare dritti verso un obiettivo comune.',
+    accent: '#9BD8B8',
     icon: teamwork,
-    tapeColor: 'rgba(34, 211, 238, 0.35)',
-    rotation: 'rotate-[1deg]',
   },
   {
     title: 'Creatività & Visione UX',
+    windowTitle: 'UX_Vision.sketch',
     desc: 'Dare forma a idee e interfacce attraverso il design e la contaminazione tra linguaggi visivi, mettendo sempre l’utente al centro.',
+    accent: '#B79FDB',
     icon: creativity,
-    tapeColor: 'rgba(236, 72, 153, 0.35)',
-    rotation: 'rotate-[-0.5deg]',
   },
   {
     title: 'Gaming Mindset & Resilienza',
+    windowTitle: 'Gaming_Mindset.log',
     desc: 'Studio le meccaniche, analizzo i problemi complessi e trasformo ogni bug o blocco in un livello da superare per crescere e migliorare.',
+    accent: '#8FC1E3',
     icon: gamer,
-    tapeColor: 'rgba(168, 85, 247, 0.35)',
-    rotation: 'rotate-[1.2deg]',
   },
   {
     title: 'Focus & Continuous Learning',
+    windowTitle: 'Continuous_Learning.ts',
     desc: 'La giusta concentrazione e la costante curiosità di esplorare nuovi strumenti, linguaggi e metodologie per non fermarsi mai.',
+    accent: '#FBEFA8',
     icon: music,
-    tapeColor: 'rgba(56, 189, 248, 0.35)',
-    rotation: 'rotate-[-1.5deg]',
   },
 ];
 
-// Nastro adesivo decorativo superiore
-const TapeHeader = ({ color = 'rgba(34,211,238,0.35)' }: { color?: string }) => (
-  <div
-    className="absolute -top-3.5 left-1/2 -translate-x-1/2 w-28 h-6 z-20 pointer-events-none backdrop-blur-[1px]"
-    style={{
-      backgroundColor: color,
-      clipPath: 'polygon(0% 15%, 4% 0%, 96% 0%, 100% 12%, 98% 88%, 94% 100%, 5% 100%, 0% 85%)',
-    }}
-  >
-    <div className="w-full h-1/2 bg-white/10" />
-  </div>
-);
+// ── 🗂️ COMPONENTE CARD / EDITOR WINDOW ───────────────────────
+
+function SkillCard({
+  windowTitle,
+  title,
+  subtitle,
+  accent,
+  icon,
+  skills,
+  index,
+}: {
+  windowTitle: string;
+  title: string;
+  subtitle?: string;
+  accent: string;
+  icon?: string;
+  skills?: SkillItem[];
+  index: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [hovered, setHovered] = useState(false);
+  const [activeTool, setActiveTool] = useState<string | null>(null);
+  const prefersReducedMotion = useReducedMotion();
+
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+
+  const rotateX = useSpring(useTransform(rawY, [-0.5, 0.5], [2, -2]), {
+    stiffness: 300,
+    damping: 30,
+  });
+  const rotateY = useSpring(useTransform(rawX, [-0.5, 0.5], [-2, 2]), {
+    stiffness: 300,
+    damping: 30,
+  });
+  const liftY = useSpring(hovered ? -4 : 0, { stiffness: 320, damping: 25 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    rawX.set((e.clientX - rect.left) / rect.width - 0.5);
+    rawY.set((e.clientY - rect.top) / rect.height - 0.5);
+  };
+
+  const handleLeave = () => {
+    setHovered(false);
+    rawX.set(0);
+    rawY.set(0);
+  };
+
+  return (
+    <motion.div
+      initial={prefersReducedMotion ? undefined : { opacity: 0, y: 20 }}
+      whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ duration: 0.4, delay: index * 0.06 }}
+      className="relative w-full h-full"
+      style={{ perspective: 1200 }}
+    >
+      <motion.div
+        ref={ref}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={handleLeave}
+        style={{
+          rotateX: prefersReducedMotion ? 0 : rotateX,
+          rotateY: prefersReducedMotion ? 0 : rotateY,
+          y: liftY,
+          transformStyle: 'preserve-3d',
+        }}
+        className="relative w-full h-full transform-gpu will-change-transform"
+      >
+        <div
+          style={{
+            backgroundColor: '#16141F',
+            border: '1px solid rgba(255,255,255,0.08)',
+            boxShadow: '0 20px 40px -20px rgba(0,0,0,0.5)',
+          }}
+          className="w-full h-full rounded-2xl flex flex-col justify-between relative overflow-hidden group transition-all duration-300 hover:border-white/20"
+        >
+          {/* Grana carta finissima */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-30"
+            style={{ backgroundImage: PAPER_GRAIN, backgroundSize: '200px 200px' }}
+            aria-hidden="true"
+          />
+
+          {/* Barra Tab / Editor Header */}
+          <div
+            className="px-4 py-3 flex items-center justify-between select-none relative z-10"
+            style={{ backgroundColor: '#100E17', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: accent }} />
+              <span className="text-xs font-mono tracking-wide truncate max-w-55 text-zinc-300">
+                {activeTool ? `src/skills/${activeTool.toLowerCase()}` : windowTitle}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 opacity-40 group-hover:opacity-80 transition-opacity">
+              <div className="w-2 h-2 rounded-full bg-white/30" />
+              <div className="w-2 h-2 rounded-full bg-white/30" />
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: accent }} />
+            </div>
+          </div>
+
+          {/* Contenitore interno con spaziature generose (whitespace curato) */}
+          <div className="p-7 flex flex-col justify-between grow relative z-10 space-y-6">
+            {icon && (
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center p-2.5 shadow-inner"
+                style={{
+                  backgroundColor: '#100E17',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
+                <img src={icon} alt={title} className="w-full h-full object-contain filter brightness-110" />
+              </div>
+            )}
+
+            <div className="space-y-2.5">
+              <h4 className="text-xl font-medium tracking-tight text-white" style={{ ...display }}>
+                {title}
+              </h4>
+              {subtitle && (
+                <p className="text-sm leading-relaxed text-zinc-400 font-sans">
+                  {subtitle}
+                </p>
+              )}
+            </div>
+
+            {skills && (
+              <div className="grid grid-cols-4 gap-3 pt-2">
+                {skills.map((skill) => (
+                  <div
+                    key={skill.name}
+                    title={skill.name}
+                    onMouseEnter={() => setActiveTool(skill.name)}
+                    onMouseLeave={() => setActiveTool(null)}
+                    className="flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 group/item cursor-pointer shadow-sm hover:bg-white/5 hover:border-white/10"
+                    style={{
+                      backgroundColor: '#100E17',
+                      border: '1px solid rgba(255,255,255,0.04)',
+                    }}
+                  >
+                    <img
+                      src={skill.icon}
+                      alt={skill.name}
+                      className="w-7 h-7 object-contain filter drop-shadow group-hover/item:scale-110 transition-transform duration-200"
+                    />
+                    <span className="text-[10px] font-mono mt-2 truncate max-w-full text-zinc-400 group-hover/item:text-zinc-200">
+                      {skill.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Footer Card Minimal */}
+          <div
+            className="px-7 py-3.5 relative z-10 flex items-center justify-between text-xs font-sans"
+            style={{ backgroundColor: '#100E17', borderTop: '1px solid rgba(255,255,255,0.05)', color: '#8A8371' }}
+          >
+            <span className="font-mono text-[11px] text-zinc-500">status: verified</span>
+            <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color: accent }}>
+              &lt;/&gt; production
+            </span>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ── 🧩 SEZIONE PRINCIPALE SKILLS ──────────────────────────────
 
 export default function SkillsSection() {
   const prefersReducedMotion = useReducedMotion();
 
   return (
-    <section className="relative w-full bg-[#060509] py-20 px-4 sm:px-6 lg:px-8 overflow-hidden z-10">
-      {/* Noise overlay di fondo */}
+    <section id="skills" className="relative w-full bg-[#0B0910] py-32 px-4 sm:px-8 lg:px-16 overflow-hidden z-10 text-neutral-100">
+      {/* Sfondo Atmosferico con Glow soffuso */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-30"
-        style={{ backgroundImage: NOISE_PATTERN, backgroundSize: '300px 300px' }}
         aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-125 w-200 rounded-full blur-[160px] opacity-20"
+        style={{ backgroundColor: '#B79FDB' }}
       />
 
-      <div className="max-w-6xl mx-auto space-y-20 relative z-10">
+      <div className="max-w-7xl mx-auto space-y-24 relative z-10">
         
-        {/* ── SEZIONE HARD SKILLS ──────────────────────────────── */}
+        {/* Header Introduttivo in stile editoriale */}
+        <div className="text-center max-w-2xl mx-auto space-y-4">
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-xl tracking-wide"
+            style={{ ...handwritten, color: '#B79FDB' }}
+          >
+            cassetta degli attrezzi ✦
+          </motion.p>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight text-white leading-tight"
+            style={{ ...display }}
+          >
+            Strumenti &amp; Metodo
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-base sm:text-lg leading-relaxed text-zinc-400 font-sans"
+          >
+            Un ecosistema tecnico e creativo strutturato per trasformare idee complesse in interfacce fluide e funzionali.
+          </motion.p>
+        </div>
+
+        {/* ── HARD SKILLS ────────────────────────────────────── */}
         <div className="space-y-10">
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="font-mono text-xs tracking-widest uppercase text-cyan-400 font-semibold">
-              ✦ HARD SKILLS &amp; TOOLKIT ✦
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-              Strumenti &amp; Tecnologie
-            </h2>
-            <p className="text-zinc-400 text-sm sm:text-base">
-              Il mio stack operativo quotidiano, dal codice pulito ai software di grafica e design.
-            </p>
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <h3 className="text-xs sm:text-sm font-mono tracking-widest uppercase flex items-center gap-2.5 text-[#B79FDB]">
+              <span className="w-2 h-2 rounded-full bg-[#B79FDB]" /> Hard Skills / Tech Stack &amp; Design
+            </h3>
+            <span className="font-mono text-xs text-zinc-500">01 // engineering</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
             {HARD_SKILLS_CATEGORIES.map((cat, idx) => (
-              <motion.div
+              <SkillCard
                 key={cat.title}
-                initial={prefersReducedMotion ? undefined : { opacity: 0, y: 20 }}
-                whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.1 }}
-                transition={{ duration: 0.4, delay: idx * 0.08 }}
-                className="relative bg-[#0e0d13] border border-white/10 p-6 shadow-xl flex flex-col justify-between group hover:border-white/20 transition-all duration-300"
-                style={{
-                  clipPath: 'polygon(0.4% 0.5%, 99.6% 0.2%, 99.2% 99.5%, 0.5% 99.1%)',
-                }}
-              >
-                <TapeHeader color={cat.accent + '55'} />
-
-                <div>
-                  <div className="flex items-center justify-between border-b border-zinc-800 pb-3 mb-5">
-                    <h3 className="text-base font-bold text-white tracking-wide flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.accent }} />
-                      {cat.title}
-                    </h3>
-                    <span className="font-mono text-[10px] text-zinc-600">0{idx + 1}</span>
-                  </div>
-
-                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 pt-2">
-                    {cat.skills.map((skill) => (
-                      <div
-                        key={skill.name}
-                        title={skill.name}
-                        className="relative flex flex-col items-center justify-center p-2 rounded-lg bg-zinc-900/80 border border-zinc-800/80 hover:border-cyan-500/50 hover:bg-zinc-800/80 transition-all group/item cursor-pointer"
-                      >
-                        <img
-                          src={skill.icon}
-                          alt={skill.name}
-                          className="w-8 h-8 object-contain filter drop-shadow group-hover/item:scale-110 transition-transform duration-200"
-                        />
-                        <span className="absolute -bottom-7 opacity-0 group-hover/item:opacity-100 transition-opacity bg-zinc-950 text-cyan-300 text-[10px] font-mono px-1.5 py-0.5 rounded border border-zinc-800 pointer-events-none whitespace-nowrap z-30 shadow-md">
-                          {skill.name}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-8 pt-3 border-t border-dashed border-zinc-800/80 flex justify-between items-center text-[10px] font-mono text-zinc-600">
-                  <span>verified stack</span>
-                  <span className="text-cyan-400/60">&lt;/&gt;</span>
-                </div>
-              </motion.div>
+                index={idx}
+                windowTitle={cat.windowTitle}
+                title={cat.title}
+                subtitle={cat.subtitle}
+                accent={cat.accent}
+                skills={cat.skills}
+              />
             ))}
           </div>
         </div>
 
-        {/* ── SEZIONE SOFT SKILLS & HOBBIES ───────────────────── */}
-        <div className="space-y-10 pt-10 border-t border-zinc-800/60">
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="font-mono text-xs tracking-widest uppercase text-pink-400 font-semibold">
-              ✦ MINDSET &amp; PASSIONS ✦
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-              Soft Skills &amp; Hobbies
-            </h2>
-            <p className="text-zinc-400 text-sm sm:text-base">
-              Ciò che alimenta la mia curiosità, la mia empatia e il mio approccio creativo alla risoluzione dei problemi.
-            </p>
+        {/* ── SOFT SKILLS ────────────────────────────────────── */}
+        <div className="space-y-10 pt-8">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <h3 className="text-xs sm:text-sm font-mono tracking-widest uppercase flex items-center gap-2.5 text-[#F5A6C6]">
+              <span className="w-2 h-2 rounded-full bg-[#F5A6C6]" /> Soft Skills / Mindset &amp; Values
+            </h3>
+            <span className="font-mono text-xs text-zinc-500">02 // human approach</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
             {SOFT_SKILLS.map((soft, idx) => (
-              <motion.div
+              <SkillCard
                 key={soft.title}
-                initial={prefersReducedMotion ? undefined : { opacity: 0, y: 20 }}
-                whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.1 }}
-                transition={{ duration: 0.4, delay: idx * 0.08 }}
-                className={`relative bg-[#0e0d13] border border-white/10 p-6 sm:p-7 shadow-xl flex flex-col justify-between transition-transform hover:scale-[1.02] duration-300 ${soft.rotation}`}
-                style={{
-                  clipPath: 'polygon(0.5% 0.3%, 99.6% 0.6%, 98.9% 99.6%, 0.2% 99.2%)',
-                }}
-              >
-                <TapeHeader color={soft.tapeColor} />
-
-                <div className="space-y-4">
-                  <div className="w-12 h-12 rounded-xl bg-zinc-900/90 border border-zinc-800 flex items-center justify-center p-2.5 shadow-inner">
-                    <img src={soft.icon} alt={soft.title} className="w-full h-full object-contain filter brightness-90" />
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-bold text-white tracking-tight mb-2">
-                      {soft.title}
-                    </h3>
-                    <p className="text-zinc-300 text-sm leading-relaxed font-sans">
-                      {soft.desc}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-6 pt-3 border-t border-dashed border-zinc-800/80 flex justify-between items-center text-[10px] font-mono text-zinc-600">
-                  <span>life &amp; growth</span>
-                  <span className="text-pink-400/70">♡</span>
-                </div>
-              </motion.div>
+                index={idx}
+                windowTitle={soft.windowTitle}
+                title={soft.title}
+                subtitle={soft.desc}
+                accent={soft.accent}
+                icon={soft.icon}
+              />
             ))}
           </div>
         </div>

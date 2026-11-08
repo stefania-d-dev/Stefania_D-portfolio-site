@@ -1,7 +1,8 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import './index.css';
 
+import { Preloader } from './components/Preloader';
 import Navbar from './components/Navbar/Navbar';
 import BackgroundImgHome from './components/Home/BackgroundImgHome';
 import AboutContent from './components/About/AboutContent';
@@ -10,6 +11,16 @@ import ProjectSection from './components/ProjectCards/ProjectSection';
 import Footer from './components/Footer/Footer';
 import CookieBanner from './components/CookieBanner/CookieBanner';
 import ProjectDetail from './components/ProjectCards/ProjectDetail';
+import TwitchHome from './components/twitch/TwitchHome';
+
+// Componente per riportare la pagina in cima ad ogni cambio rotta
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [pathname]);
+  return null;
+}
 
 function HomeView() {
   return (
@@ -28,11 +39,23 @@ function HomeView() {
 }
 
 export default function App() {
+  const [loaded, setLoaded] = useState(false);
+
   return (
-    <Routes>
-      <Route path="/" element={<HomeView />} />
-      <Route path="/project/:id" element={<ProjectDetail />} />
-      <Route path="/code/:id" element={<ProjectDetail />} />
-    </Routes>
+    <>
+      {/* Preloader visivo all'avvio */}
+      <Preloader onLoadingComplete={() => setLoaded(true)} />
+
+      {/* Contenuto principale protetto dal fade del preloader e gestore dello scroll */}
+      <div className={`transition-opacity duration-1000 ${loaded ? 'opacity-100' : 'opacity-0'}`}>
+        <ScrollToTop />
+        <Routes>
+          <Route path="/" element={<HomeView />} />
+          <Route path="/twitch" element={<TwitchHome />} />
+          <Route path="/project/:id" element={<ProjectDetail />} />
+          <Route path="/code/:id" element={<ProjectDetail />} />
+        </Routes>
+      </div>
+    </>
   );
 }

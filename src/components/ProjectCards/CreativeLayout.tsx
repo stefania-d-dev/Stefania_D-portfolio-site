@@ -2,6 +2,16 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import {
+  ArrowLeft,
+  Sparkle,
+  FolderOpen,
+  Code,
+  Globe,
+  GithubLogo,
+  FigmaLogo,
+  TerminalWindow,
+} from '@phosphor-icons/react';
 
 interface GalleryItem {
   url: string;
@@ -64,65 +74,102 @@ interface CreativeLayoutProps {
   type?: 'design' | 'code';
 }
 
+const PAPER_GRAIN = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E")`;
+const handwritten = { fontFamily: "'Caveat', cursive" };
+const display = { fontFamily: "'Fraunces', ui-serif, Georgia, serif" };
+
 const CreativeLayout: React.FC<CreativeLayoutProps> = ({ project }) => {
   const primaryImage = project.image || project.coverImage;
   const isCodeProject = project.category === 'code' || (project.tech && project.tech.length > 0);
   const liveDemoLink = project.liveUrl;
   const sourceCodeLink = project.repo || project.githubUrl;
+  const formattedTitle = project.title.replace(/_/g, ' ');
+  const accentColor = project.accent || (isCodeProject ? '#B79FDB' : '#F5A6C6');
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-100 selection:bg-zinc-200 selection:text-black font-sans antialiased">
+    <div className="relative w-full min-h-screen bg-[#0B0910] text-neutral-100 selection:bg-[#B79FDB]/30 selection:text-white font-sans antialiased overflow-hidden">
       
-      {/* Header Stile Rivista con Glassmorphism */}
-      <header className="sticky top-0 left-0 w-full z-50 bg-[#09090b]/80 backdrop-blur-xl border-b border-zinc-800/80 px-8 py-5 flex justify-between items-center transition-all duration-300">
+      {/* Sfondo Atmosferico con Glow soffuso */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute right-1/4 top-20 h-125 w-200 rounded-full blur-[160px] opacity-15"
+        style={{ backgroundColor: accentColor }}
+      />
+
+      {/* Grid Texture & Noise */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-45"
+        style={{ backgroundImage: PAPER_GRAIN, backgroundSize: '200px 200px' }}
+        aria-hidden="true"
+      />
+
+      {/* Header Stile IDE / Workspace */}
+      <header className="sticky top-0 left-0 w-full z-50 bg-[#0B0910]/90 backdrop-blur-xl border-b border-white/10 px-6 sm:px-12 py-4 flex justify-between items-center transition-all duration-300">
         <Link 
           to="/" 
-          className="group inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-zinc-400 hover:text-white transition-colors font-medium"
+          className="group inline-flex items-center gap-2.5 font-mono text-xs uppercase tracking-widest text-zinc-400 hover:text-white transition-colors"
         >
-          <span className="group-hover:-translate-x-1 transition-transform duration-300">←</span> Indice Progetti
+          <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> 
+          <span>Workspace / Indice</span>
         </Link>
-        <span className="text-xs text-zinc-400 tracking-[0.25em] uppercase font-semibold">
-          {project.title.replace(/_/g, ' ')}
+        
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-md bg-[#100E17] border border-white/10 text-xs font-mono text-zinc-400">
+          <FolderOpen size={13} style={{ color: accentColor }} />
+          <span>project_{project.id.toLowerCase()}.tsx</span>
+        </div>
+
+        <span className="text-xs font-mono font-semibold tracking-wider text-zinc-300 truncate max-w-45 sm:max-w-xs">
+          {formattedTitle}
         </span>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 md:px-12 pt-20 pb-36">
+      <main className="max-w-6xl mx-auto px-6 md:px-12 pt-20 pb-36 relative z-10">
         
         {/* EDITORIAL HERO */}
-        <div className="mb-16 space-y-8 max-w-4xl">
-          <div className="flex flex-wrap items-center gap-4 text-xs uppercase tracking-[0.25em] text-zinc-400 font-medium">
-            <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-pulse" />
+        <div className="mb-20 space-y-8 max-w-4xl">
+          <div className="flex flex-wrap items-center gap-4 text-xs font-mono uppercase tracking-widest text-zinc-400">
+            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: accentColor }} />
             <span>{isCodeProject ? (project.type || 'Creative Engineering & Code') : 'Case Study & Direzione Strategica'}</span>
-            {project.duration && <span>• {project.duration}</span>}
-            {project.status && <span className="text-emerald-400 font-mono">• {project.status}</span>}
+            {project.duration && (
+              <>
+                <span className="text-zinc-600">•</span>
+                <span>{project.duration}</span>
+              </>
+            )}
+            {project.status && (
+              <>
+                <span className="text-zinc-600">•</span>
+                <span className="text-emerald-400">{project.status}</span>
+              </>
+            )}
           </div>
 
-          <h1 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tight text-white leading-[0.95]">
-            {project.title.replace(/_/g, ' ')}
+          <h1 className="text-5xl sm:text-7xl md:text-8xl font-medium tracking-tight text-white leading-[1.05]" style={display}>
+            {formattedTitle}
           </h1>
 
           {project.tagline && (
-            <p className="text-xl md:text-3xl text-zinc-300 font-light leading-snug tracking-tight">
-              {project.tagline}
+            <p className="text-xl md:text-3xl text-zinc-300 font-light leading-snug tracking-tight" style={{ ...handwritten, color: accentColor }}>
+              "{project.tagline}"
             </p>
           )}
 
           {project.description && (
-            <p className="text-base md:text-lg text-zinc-400 leading-relaxed font-normal pt-4 border-l-2 border-zinc-700 pl-6 max-w-3xl">
+            <p className="text-base md:text-lg text-zinc-400 leading-relaxed font-normal pt-2 border-l-2 pl-6 max-w-3xl" style={{ borderColor: accentColor }}>
               {project.description}
             </p>
           )}
 
-          {/* PULSANTI DI ACCESSO ESTERNO (Live Demo, GitHub, Codepen, Figma) */}
+          {/* PULSANTI DI ACCESSO ESTERNO */}
           <div className="flex flex-wrap gap-4 pt-4">
             {liveDemoLink && (
               <a 
                 href={liveDemoLink} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-black font-semibold text-xs uppercase tracking-widest hover:bg-zinc-200 transition-colors shadow-lg"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white text-zinc-950 font-mono text-xs uppercase tracking-widest font-bold hover:bg-zinc-200 transition-colors shadow-lg cursor-pointer"
               >
-                Visualizza Live Demo →
+                <Globe size={15} weight="bold" /> Visualizza Live Demo →
               </a>
             )}
             {sourceCodeLink && (
@@ -130,9 +177,9 @@ const CreativeLayout: React.FC<CreativeLayoutProps> = ({ project }) => {
                 href={sourceCodeLink} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-200 font-semibold text-xs uppercase tracking-widest hover:bg-zinc-800 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#16141F] border border-white/10 text-zinc-200 font-mono text-xs uppercase tracking-widest font-bold hover:border-white/30 hover:text-white transition-colors cursor-pointer"
               >
-                Codice Sorgente (GitHub)
+                <GithubLogo size={15} weight="bold" /> Codice Sorgente
               </a>
             )}
             {project.codepen && (
@@ -140,9 +187,9 @@ const CreativeLayout: React.FC<CreativeLayoutProps> = ({ project }) => {
                 href={project.codepen} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-200 font-semibold text-xs uppercase tracking-widest hover:bg-zinc-800 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#16141F] border border-white/10 text-zinc-200 font-mono text-xs uppercase tracking-widest font-bold hover:border-white/30 hover:text-white transition-colors cursor-pointer"
               >
-                Visualizza Codepen
+                <Code size={15} weight="bold" /> CodePen
               </a>
             )}
             {project.figmaUrl && (
@@ -150,16 +197,16 @@ const CreativeLayout: React.FC<CreativeLayoutProps> = ({ project }) => {
                 href={project.figmaUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-200 font-semibold text-xs uppercase tracking-widest hover:bg-zinc-800 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#16141F] border border-white/10 text-zinc-200 font-mono text-xs uppercase tracking-widest font-bold hover:border-white/30 hover:text-white transition-colors cursor-pointer"
               >
-                Progetto Figma
+                <FigmaLogo size={15} weight="bold" /> Figma Board
               </a>
             )}
           </div>
         </div>
 
         {/* METADATI DI PROGETTO */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-8 mb-20 border-y border-zinc-800/80 text-xs tracking-wider uppercase font-medium">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-8 mb-24 border-y border-white/10 text-xs font-mono uppercase tracking-wider">
           {project.role && (
             <div className="space-y-1">
               <span className="text-zinc-500 block">Ruolo</span>
@@ -183,39 +230,41 @@ const CreativeLayout: React.FC<CreativeLayoutProps> = ({ project }) => {
             </div>
           )}
         </div>
-{/* SEZIONE CASO STUDIO: SCOPO, OBIETTIVO E APPROCCIO */}
-{(project.projectScope || project.objective || project.approach) && (
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-28">
-    {project.projectScope && (
-      <div className="p-8 rounded-3xl bg-zinc-950 border border-zinc-800/80 space-y-3 shadow-xl">
-        <span className="text-xs uppercase tracking-[0.25em] text-zinc-500 font-semibold block">01 / Scopo</span>
-        <h4 className="text-xl font-bold text-white">Perché è iniziato</h4>
-        <p className="text-zinc-300 text-sm leading-relaxed">{project.projectScope}</p>
-      </div>
-    )}
-    {project.objective && (
-      <div className="p-8 rounded-3xl bg-zinc-950 border border-zinc-800/80 space-y-3 shadow-xl">
-        <span className="text-xs uppercase tracking-[0.25em] text-zinc-500 font-semibold block">02 / Obiettivo</span>
-        <h4 className="text-xl font-bold text-white">Traguardo Raggiunto</h4>
-        <p className="text-zinc-300 text-sm leading-relaxed">{project.objective}</p>
-      </div>
-    )}
-    {project.approach && (
-      <div className="p-8 rounded-3xl bg-zinc-950 border border-zinc-800/80 space-y-3 shadow-xl">
-        <span className="text-xs uppercase tracking-[0.25em] text-zinc-500 font-semibold block">03 / Approccio</span>
-        <h4 className="text-xl font-bold text-white">Processo Seguito</h4>
-        <p className="text-zinc-300 text-sm leading-relaxed">{project.approach}</p>
-      </div>
-    )}
-  </div>
-)}
-        {/* TECH STACK (Per tutti i progetti di codice) */}
+
+        {/* SEZIONE CASO STUDIO: SCOPO, OBIETTIVO E APPROCCIO */}
+        {(project.projectScope || project.objective || project.approach) && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-28">
+            {project.projectScope && (
+              <div className="p-8 rounded-2xl bg-[#16141F] border border-white/10 space-y-3 shadow-xl">
+                <span className="text-xs font-mono uppercase tracking-widest text-[#B79FDB] block">01 / Scopo</span>
+                <h4 className="text-xl font-medium text-white" style={display}>Perché è iniziato</h4>
+                <p className="text-zinc-300 text-sm leading-relaxed font-sans">{project.projectScope}</p>
+              </div>
+            )}
+            {project.objective && (
+              <div className="p-8 rounded-2xl bg-[#16141F] border border-white/10 space-y-3 shadow-xl">
+                <span className="text-xs font-mono uppercase tracking-widest text-[#F5A6C6] block">02 / Obiettivo</span>
+                <h4 className="text-xl font-medium text-white" style={display}>Traguardo Raggiunto</h4>
+                <p className="text-zinc-300 text-sm leading-relaxed font-sans">{project.objective}</p>
+              </div>
+            )}
+            {project.approach && (
+              <div className="p-8 rounded-2xl bg-[#16141F] border border-white/10 space-y-3 shadow-xl">
+                <span className="text-xs font-mono uppercase tracking-widest text-[#9BD8B8] block">03 / Approccio</span>
+                <h4 className="text-xl font-medium text-white" style={display}>Processo Seguito</h4>
+                <p className="text-zinc-300 text-sm leading-relaxed font-sans">{project.approach}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TECH STACK */}
         {project.tech && project.tech.length > 0 && (
-          <div className="mb-20 p-8 rounded-3xl bg-zinc-950 border border-zinc-800/80 shadow-xl">
-            <span className="text-xs uppercase tracking-[0.25em] text-zinc-500 font-semibold block mb-4">Tech Stack & Librerie Utilizzate</span>
+          <div className="mb-24 p-8 rounded-2xl bg-[#16141F] border border-white/10 shadow-xl">
+            <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 block mb-4">Tech Stack & Librerie Utilizzate</span>
             <div className="flex flex-wrap gap-2.5">
               {project.tech.map((t, i) => (
-                <span key={i} className="bg-zinc-900 text-zinc-200 text-xs px-4 py-2 rounded-xl border border-zinc-700 font-mono tracking-wider shadow-sm">
+                <span key={i} className="bg-[#100E17] text-zinc-200 text-xs px-4 py-2 rounded-xl border border-white/10 font-mono tracking-wider shadow-inner">
                   {t}
                 </span>
               ))}
@@ -225,38 +274,38 @@ const CreativeLayout: React.FC<CreativeLayoutProps> = ({ project }) => {
 
         {/* IMMAGINE / ANTEPRIMA PRINCIPALE */}
         {primaryImage && (
-          <div className="mb-28 group relative overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-950 shadow-2xl">
+          <div className="mb-28 group relative overflow-hidden rounded-2xl border border-white/10 bg-[#16141F] shadow-2xl">
             {isCodeProject && (
-              <div className="bg-zinc-900/90 px-4 py-3 border-b border-zinc-800 flex items-center gap-2">
+              <div className="bg-[#100E17] px-4 py-3 border-b border-white/10 flex items-center justify-between">
                 <div className="flex gap-1.5">
-                  <span className="w-3 h-3 rounded-full bg-zinc-700 block" />
-                  <span className="w-3 h-3 rounded-full bg-zinc-700 block" />
-                  <span className="w-3 h-3 rounded-full bg-zinc-700 block" />
+                  <span className="w-3 h-3 rounded-full bg-white/20 block" />
+                  <span className="w-3 h-3 rounded-full bg-white/20 block" />
+                  <span className="w-3 h-3 rounded-full bg-white/20 block" />
                 </div>
-                <div className="mx-auto bg-zinc-950 px-6 py-1 rounded-md text-[11px] text-zinc-400 font-mono tracking-wide border border-zinc-800/50">
-                  {liveDemoLink || `https://${project.title.toLowerCase().replace(/_/g, '')}.app`}
+                <div className="bg-[#16141F] px-6 py-1 rounded-md text-[11px] text-zinc-400 font-mono tracking-wide border border-white/10">
+                  {liveDemoLink || `https://${project.id}.app`}
                 </div>
+                <TerminalWindow size={16} className="text-zinc-500" />
               </div>
             )}
             <img 
               src={primaryImage} 
-              alt={project.title} 
+              alt={formattedTitle} 
               className="w-full h-auto object-cover max-h-[80vh] group-hover:scale-102 transition-transform duration-700 ease-out" 
             />
           </div>
         )}
 
-        {/* STRUTTURA EDITORIALE: Sfida e Soluzione (mappata anche su challenge/solution o originalBrief) */}
+        {/* STRUTTURA EDITORIALE: Sfida e Soluzione */}
         <div className="space-y-28 mb-32">
-          
           {project.challenge && (
             <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
               <div className="md:col-span-4 sticky top-28 space-y-2">
-                <span className="text-xs uppercase tracking-[0.25em] text-zinc-500 font-semibold">01 / Criticità</span>
-                <h3 className="text-2xl font-bold text-white tracking-tight">La Sfida di Progetto</h3>
+                <span className="text-xs font-mono uppercase tracking-widest text-[#F5A6C6]">01 / Criticità</span>
+                <h3 className="text-3xl font-medium text-white tracking-tight" style={display}>La Sfida di Progetto</h3>
               </div>
-              <div className="md:col-span-8 p-8 md:p-10 rounded-3xl bg-zinc-950 border border-zinc-800/80 shadow-xl">
-                <p className="text-zinc-300 text-lg leading-relaxed font-normal">{project.challenge}</p>
+              <div className="md:col-span-8 p-8 md:p-10 rounded-2xl bg-[#16141F] border border-white/10 shadow-xl">
+                <p className="text-zinc-300 text-lg leading-relaxed font-normal font-sans">{project.challenge}</p>
               </div>
             </div>
           )}
@@ -264,35 +313,35 @@ const CreativeLayout: React.FC<CreativeLayoutProps> = ({ project }) => {
           {project.solution && (
             <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
               <div className="md:col-span-4 sticky top-28 space-y-2">
-                <span className="text-xs uppercase tracking-[0.25em] text-zinc-400 font-semibold">02 / Implementazione</span>
-                <h3 className="text-2xl font-bold text-white tracking-tight">Soluzione & Architettura</h3>
+                <span className="text-xs font-mono uppercase tracking-widest text-[#B79FDB]">02 / Implementazione</span>
+                <h3 className="text-3xl font-medium text-white tracking-tight" style={display}>Soluzione & Architettura</h3>
               </div>
-              <div className="md:col-span-8 p-8 md:p-12 rounded-3xl bg-linear-to-br from-zinc-900 to-zinc-950 border border-zinc-700 shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none" />
-                <p className="text-zinc-100 text-xl leading-relaxed font-normal relative z-10">{project.solution}</p>
+              <div className="md:col-span-8 p-8 md:p-12 rounded-2xl bg-[#16141F] border border-white/20 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-[#B79FDB]/10 rounded-full blur-3xl pointer-events-none" />
+                <p className="text-zinc-100 text-lg leading-relaxed font-normal relative z-10 font-sans">{project.solution}</p>
               </div>
             </div>
           )}
 
-          {/* SEZIONE LOGICA SPECIFICA DEI PROGETTI CODE (logicFeatures & logicIntro) */}
+          {/* SPECIFICHE TECNICHE E LOGICA */}
           {project.logicFeatures && project.logicFeatures.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start pt-8">
               <div className="md:col-span-4 sticky top-28 space-y-2">
-                <span className="text-xs uppercase tracking-[0.25em] text-emerald-400 font-semibold">
+                <span className="text-xs font-mono uppercase tracking-widest text-[#9BD8B8]">
                   {project.logicLabel || 'Engineering Logic'}
                 </span>
-                <h3 className="text-2xl font-bold text-white tracking-tight">Specifiche Tecniche & Funzionalità</h3>
+                <h3 className="text-3xl font-medium text-white tracking-tight" style={display}>Specifiche Tecniche & Funzionalità</h3>
               </div>
-              <div className="md:col-span-8 p-8 md:p-10 rounded-3xl bg-zinc-950 border border-zinc-800/80 shadow-xl space-y-6">
+              <div className="md:col-span-8 p-8 md:p-10 rounded-2xl bg-[#16141F] border border-white/10 shadow-xl space-y-6">
                 {project.logicIntro && (
-                  <p className="text-zinc-300 text-base italic border-l-2 border-emerald-500 pl-4 py-1">
+                  <p className="text-zinc-300 text-base italic border-l-2 border-[#9BD8B8] pl-4 py-1" style={handwritten}>
                     "{project.logicIntro}"
                   </p>
                 )}
                 <ul className="space-y-4">
                   {project.logicFeatures.map((feat, idx) => (
                     <li key={idx} className="flex items-start gap-3 text-zinc-300 text-base font-normal">
-                      <span className="text-emerald-400 font-mono mt-1">▸</span>
+                      <span className="text-[#9BD8B8] font-mono mt-1">▸</span>
                       <span>{feat}</span>
                     </li>
                   ))}
@@ -304,11 +353,11 @@ const CreativeLayout: React.FC<CreativeLayoutProps> = ({ project }) => {
 
         {/* CITAZIONE TECNICA / FILOSOFIA */}
         {(project.technicalQuote || project.designPhilosophy) && (
-          <div className="my-36 py-20 px-8 md:px-16 rounded-3xl border border-zinc-800/80 bg-zinc-950 text-center relative overflow-hidden shadow-2xl">
-            <span className="text-xs uppercase tracking-[0.3em] text-zinc-500 mb-6 block font-semibold">
+          <div className="my-36 py-20 px-8 md:px-16 rounded-2xl border border-white/10 bg-[#16141F] text-center relative overflow-hidden shadow-2xl">
+            <span className="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-6 block">
               Principio di Sviluppo
             </span>
-            <blockquote className="text-2xl md:text-4xl font-light text-zinc-100 max-w-3xl mx-auto leading-relaxed tracking-tight">
+            <blockquote className="text-2xl md:text-4xl font-light text-zinc-100 max-w-3xl mx-auto leading-relaxed tracking-tight" style={display}>
               "{project.technicalQuote || project.designPhilosophy}"
             </blockquote>
           </div>
@@ -317,10 +366,10 @@ const CreativeLayout: React.FC<CreativeLayoutProps> = ({ project }) => {
         {/* GALLERY IMMAGINI */}
         {project.galleryImages && project.galleryImages.length > 0 && (
           <div className="space-y-16 mb-32">
-            <div className="border-b border-zinc-800 pb-6 flex justify-between items-end">
+            <div className="border-b border-white/10 pb-6 flex justify-between items-end">
               <div>
-                <span className="text-xs uppercase tracking-[0.25em] text-zinc-500 font-semibold block mb-1">Galleria Visiva</span>
-                <h3 className="text-3xl font-black text-white tracking-tight">Dettagli & Schermate</h3>
+                <span className="text-xs font-mono uppercase tracking-widest text-zinc-500 block mb-1">Galleria Visiva</span>
+                <h3 className="text-3xl font-medium text-white tracking-tight" style={display}>Dettagli & Schermate</h3>
               </div>
               <span className="text-xs font-mono text-zinc-500">{project.galleryImages.length} Asset</span>
             </div>
@@ -332,8 +381,8 @@ const CreativeLayout: React.FC<CreativeLayoutProps> = ({ project }) => {
                 const desc = typeof item === 'object' ? item.description : null;
 
                 return (
-                  <div key={index} className="rounded-3xl overflow-hidden border border-zinc-800 bg-zinc-950 p-6 flex flex-col justify-between group shadow-xl">
-                    <div className="rounded-2xl overflow-hidden bg-black flex justify-center mb-6 border border-zinc-800/50">
+                  <div key={index} className="rounded-2xl overflow-hidden border border-white/10 bg-[#16141F] p-6 flex flex-col justify-between group shadow-xl">
+                    <div className="rounded-xl overflow-hidden bg-black flex justify-center mb-6 border border-white/5">
                       <img 
                         src={imgUrl} 
                         alt={caption || `Dettaglio ${index + 1}`} 
@@ -341,7 +390,7 @@ const CreativeLayout: React.FC<CreativeLayoutProps> = ({ project }) => {
                       />
                     </div>
                     {(caption || desc) && (
-                      <div className="space-y-2 pt-4 border-t border-zinc-900">
+                      <div className="space-y-2 pt-4 border-t border-white/5">
                         {caption && <h4 className="text-base font-semibold text-white tracking-wide">{caption}</h4>}
                         {desc && <p className="text-sm text-zinc-400 leading-relaxed font-light">{desc}</p>}
                       </div>
@@ -356,10 +405,10 @@ const CreativeLayout: React.FC<CreativeLayoutProps> = ({ project }) => {
         {/* SEZIONE VIDEO */}
         {project.videos && project.videos.length > 0 && (
           <div className="space-y-16 mb-32">
-            <div className="border-b border-zinc-800 pb-6 flex justify-between items-end">
+            <div className="border-b border-white/10 pb-6 flex justify-between items-end">
               <div>
-                <span className="text-xs uppercase tracking-[0.25em] text-zinc-500 font-semibold block mb-1">Motion & Video</span>
-                <h3 className="text-3xl font-black text-white tracking-tight">Contenuti in Movimento</h3>
+                <span className="text-xs font-mono uppercase tracking-widest text-zinc-500 block mb-1">Motion & Video</span>
+                <h3 className="text-3xl font-medium text-white tracking-tight" style={display}>Contenuti in Movimento</h3>
               </div>
               <span className="text-xs font-mono text-zinc-500">Showcase</span>
             </div>
@@ -371,8 +420,8 @@ const CreativeLayout: React.FC<CreativeLayoutProps> = ({ project }) => {
                 const desc = typeof vid === 'object' ? vid.description : null;
 
                 return (
-                  <div key={index} className="rounded-3xl overflow-hidden border border-zinc-800 bg-zinc-950 p-6 flex flex-col justify-between shadow-xl">
-                    <div className="rounded-2xl overflow-hidden bg-black flex justify-center mb-6">
+                  <div key={index} className="rounded-2xl overflow-hidden border border-white/10 bg-[#16141F] p-6 flex flex-col justify-between shadow-xl">
+                    <div className="rounded-xl overflow-hidden bg-black flex justify-center mb-6">
                       <video 
                         src={vidUrl} 
                         autoPlay 
@@ -383,7 +432,7 @@ const CreativeLayout: React.FC<CreativeLayoutProps> = ({ project }) => {
                       />
                     </div>
                     {(caption || desc) && (
-                      <div className="space-y-2 pt-4 border-t border-zinc-900">
+                      <div className="space-y-2 pt-4 border-t border-white/5">
                         {caption && <h4 className="text-base font-semibold text-white tracking-wide">{caption}</h4>}
                         {desc && <p className="text-sm text-zinc-400 leading-relaxed font-light">{desc}</p>}
                       </div>
@@ -397,17 +446,17 @@ const CreativeLayout: React.FC<CreativeLayoutProps> = ({ project }) => {
 
         {/* PERFORMANCE E RISULTATI */}
         {(project.performance || project.lessonsLearned) && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-16 border-t border-zinc-800">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-16 border-t border-white/10">
             {project.performance && (
-              <div className="p-8 rounded-3xl bg-zinc-950 border border-zinc-800 space-y-3 shadow-xl">
-                <span className="text-xs uppercase tracking-[0.25em] text-zinc-400 font-semibold block">Performance & Benchmark</span>
+              <div className="p-8 rounded-2xl bg-[#16141F] border border-white/10 space-y-3 shadow-xl">
+                <span className="text-xs font-mono uppercase tracking-widest text-[#B79FDB] block">Performance & Benchmark</span>
                 <p className="text-zinc-300 text-base leading-relaxed font-light">{project.performance}</p>
               </div>
             )}
 
             {project.lessonsLearned && (
-              <div className="p-8 rounded-3xl bg-zinc-950 border border-zinc-800 space-y-3 shadow-xl">
-                <span className="text-xs uppercase tracking-[0.25em] text-zinc-400 font-semibold block">Note di Sviluppo</span>
+              <div className="p-8 rounded-2xl bg-[#16141F] border border-white/10 space-y-3 shadow-xl">
+                <span className="text-xs font-mono uppercase tracking-widest text-[#F5A6C6] block">Note di Sviluppo</span>
                 <p className="text-zinc-300 text-base leading-relaxed font-light">{project.lessonsLearned}</p>
               </div>
             )}
